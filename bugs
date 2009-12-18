@@ -1,0 +1,19 @@
+Timeout in datastore
+
+Traceback (most recent call last):
+  File "/base/python_lib/versions/1/google/appengine/ext/webapp/__init__.py", line 507, in __call__
+    handler.get(*groups)
+  File "/base/data/home/apps/smstweet/1.338327360856610425/main.py", line 201, in get
+    stats = Stats.singleton()
+  File "/base/data/home/apps/smstweet/1.338327360856610425/main.py", line 82, in singleton
+    s = Stats.get_by_key_name('key__stats')
+  File "/base/python_lib/versions/1/google/appengine/ext/db/__init__.py", line 983, in get_by_key_name
+    return get(*keys)
+  File "/base/python_lib/versions/1/google/appengine/ext/db/__init__.py", line 1182, in get
+    entities = datastore.Get(keys)
+  File "/base/python_lib/versions/1/google/appengine/api/datastore.py", line 257, in Get
+    raise _ToDatastoreError(err)
+Timeout
+
+
+

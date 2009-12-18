@@ -1,0 +1,172 @@
+/*
+  SMStweet
+  URL:
+  Author: Rohit Arondekar
+  Author URL: http://rohitarondekar.com
+*/
+
+/*
+  Reset
+*/
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+/* 
+  Layout-Grid
+*/
+
+#container {
+  width:  960px;
+  margin: 0 auto;
+}
+
+.col_1, .col_2, .col_3, .col_4, .col_5, .col_6, .col_7, .col_8, .col_9, .col_10, .col_11, .col_12, .col_13, .col_14, .col_15, .col_16 {
+  float: left;
+  margin: 0 10px;
+}
+
+/* width = 60 * nos_of_cols - 20*/
+
+.col_1 {
+  width: 40px;
+}
+
+.col_2 {
+  width: 120px;
+}
+
+.col_3 {
+  width: 160px;
+}
+
+.col_4 {
+  width: 220px;
+}
+
+.col_5 {
+  width: 280px;
+}
+
+.col_6 {
+  width: 340px;
+}
+
+.col_8 {
+  width: 460px;
+}
+
+.col_16 {
+  width: 940px;
+}
+
+br {
+  clear: both;
+}
+
+div.row {
+  clear: left;
+}
+
+/*
+  Layout-Layout
+*/
+
+a img {
+  border: 0;
+}
+
+#slogan {
+  margin: 18px 10px;
+}
+
+div#content {
+ background-color: #ececd0;
+ padding: 18px 40px;
+ margin: 0 10px;
+}
+
+/*
+  Typography
+*/
+
+body {
+  font-size:  62.5%;
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  line-height:  15px;
+}
+
+html>body {
+  font-size:  10px;
+}
+
+h1#logo {
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+h3 {
+  color: #333;
+  font-size: 1.8em;
+  font-weight: bold;
+  margin: 15px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ccc;
+}
+
+h4 {
+  color: #333;
+  font-size: 1.4em;
+  font-weight: bold;
+  margin: 15px 0;
+}
+
+p {
+  color: #444;
+  font-size: 1.1em;
+  margin: 15px 0;
+  font-family: verdana, sans-serif;
+  text-align: justify;
+  padding: 0 2px;
+}
+
+p.count {
+  font-family: "Courier New", monospace;
+  font-size: 1.8em;
+  line-height: 15px;
+  background: #000;
+  color: #fff;
+  margin: 15px 0 17px 0;
+  padding: 5px 5px 8px 5px;
+  text-align: center;
+  font-weight: bold;
+}
+
+#footer p {
+  font-size: 1em;
+  color:  #BBB;
+  text-align:  center;
+}
+
+a {
+  color:  #0077cc;
+  text-decoration:  none;
+}
+
+a:hover {
+  color:  #222;
+  text-decoration:  none;
+}
+
+#footer a {
+  color:  #999;
+  text-decoration:  none;
+}
+
+#footer a:hover {
+  color:  #222;
+  text-decoration:  none;
+}
+

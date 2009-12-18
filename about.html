@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+      <div class="col_6">
+        <h3>
+          What is <em>sms</em>tweet?
+        </h3>
+        <p>
+          No longer depend on your web browser or a twitter client. No need to install any software on your phone or use Internet on your phone. No need to pay premium rates to your network provider.
+        </p>
+        <p>
+          Just send an sms at normal rates to tweet your thoughts.
+        </p>
+      </div>
+      <div class="col_6">
+        <h3>
+          Behind the scenes
+        </h3>
+        <p>
+        SMSTweets was an idea of <a href="http://mayanks.blogspot.com">Mayank</a> before Airtel came and announced its SMS based Twitter support. This application uses <a href="http://smsgupshup.com/">SMSGupShup's</a> platform to receive and respond to users SMSes and <a href="http://appengine.google.com">Google App-Engine</a> as the server to run.</p>
+        <p>
+        Design of this site was done by <a href="http://rohitarondekar.com/">Rohit Arondekar</a> who is motivated by simplicity in his designs. Rohit and Mayank happened to meet on Twitter
+        </p>        
+      </div>
+      <div class="col_2">
+        <h3>
+          Statistics
+        </h3>
+        <p class="count">
+          {{counter}} 
+        </p>
+        <p>
+          <em>sms</em>tweets have been sent so far.
+        </p>
+      </div>
+      <br />
+    </div>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+      <div class="col_4">
+        <h3>
+          What is <em>sms</em>tweet?
+        </h3>
+        <p>
+          No longer depend on your web browser or a twitter client. No need to install any software on your phone or use Internet on your phone. No need to pay premium rates to your network provider.
+        </p>
+        <p>
+          Just send an sms at normal rates to tweet your thoughts.
+        </p>
+      </div>
+      <div class="col_4">
+        <h3>
+          Register
+        </h3>
+        {% if user_name %}
+           {{message}}
+        {% else %}
+        <p>
+        Simply Send <strong>'REGISTER &lt;username&gt; &lt;password&gt;'</strong> to <strong>09220092200</strong> or <strong>09243000111</strong>
+        </p>
+        <p>
+          Or simply click the button below.
+        </p>
+        <a href="/oauth/twitter/login"><img width="151px" height="24px" src="images/twitter_button.png" alt="sign in with Twitter" /></a>
+        {% endif %}
+      </div>
+      <div class="col_4">
+        <h3>
+          Already registered?
+        </h3>
+        <p>
+        Start tweeting by sending a message, <strong>'TWT &lt;your message&gt;'</strong> to <strong>09220092200</strong> or <strong>09243000111</strong>
+        </p>       
+        <p>9220092200 is a Mumbai number and 9243000111 is a Bangalore number. SMS from any other city will cost STD SMS charges</p>
+      </div>
+      <div class="col_2">
+        <h3>
+          Statistics
+        </h3>
+        <p class="count">
+        {{counter}}
+        </p>
+        <p>
+          <em>sms</em>tweets have been sent so far.
+        </p>
+        <h3>
+          Recent SMStweeters
+        </h3>
+        <p>
+        {% for t in recentTweeters %}
+        <a href="http://twitter.com/{{t}}" title="@{{t}}'s Twitter profile">@{{t}}</a>,
+        {% endfor %}
+        </p>
+      </div>
+      <br />
+{% endblock %}
