@@ -52,9 +52,13 @@
           Recent SMStweeters
         </h3>
         <p>
+        <ul>
         {% for t in recentTweeters %}
-        <a href="http://twitter.com/{{t}}" title="@{{t}}'s Twitter profile">@{{t}}</a>,
+        <li>
+          <a href="http://twitter.com/{{t}}" title="@{{t}}'s Twitter profile">@{{t}}</a>
+        <li>
         {% endfor %}
+        </ul>
         </p>
       </div>
       <br />
