@@ -28,6 +28,7 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.api import urlfetch
 from google.appengine.ext.webapp import template
+from google.appengine.api.datastore_errors import Timeout
 
 from twitter_oauth_handler import OAuthClient
 from twitter_oauth_handler import OAuthHandler
@@ -44,6 +45,7 @@ class IST(datetime.tzinfo):
 class DailyStat(db.Model):
   tweets = db.IntegerProperty(default = 0)
   users = db.IntegerProperty(default = 0)
+  fail_tweet = db.IntegerProperty(default = 0)
 
   @staticmethod
   def __key_name(d = None):
@@ -67,6 +69,10 @@ class DailyStat(db.Model):
 
   def new_tweet(self):
     self.tweets += 1
+    self.put()
+
+  def failed_tweet(self):
+    self.fail_tweet += 1
     self.put()
 
 class Stats(db.Model):
@@ -356,19 +362,27 @@ class UpdateTwitter(webapp.RequestHandler):
       else:
         updated = self.updateStatuswithPasswd(tuser, status)
 
-      if updated:
-        dstat = DailyStat.get_by_date()
-        dstat.new_tweet()
+      try:
+        if updated:
+          dstat = DailyStat.get_by_date()
+          dstat.new_tweet()
 
-        tuser.tweetCount += 1
-        tuser.put()
+          tuser.tweetCount += 1
+          tuser.put()
 
-      stats = Stats.singleton()
-      stats.counter += 1
-      if tuser.user not in stats.recentTweeters:
-        stats.recentTweeters.insert(0,tuser.user)
-        stats.recentTweeters.pop()
-      stats.put()
+        else:
+          dstat = DailyStat.get_by_date()
+          dstat.failed_tweet()
+
+        stats = Stats.singleton()
+        stats.counter += 1
+        if tuser.user not in stats.recentTweeters:
+          stats.recentTweeters.insert(0,tuser.user)
+          stats.recentTweeters.pop()
+        stats.put()
+
+      except Timeout, e:
+        logging.error("Timed out logging the stats !! never mind")
 
     else:
       m = re.match("^\s*(\S+)\s+(\S+)\s+(\S+)", content)
@@ -401,11 +415,21 @@ class HelpPage(webapp.RequestHandler):
   def get(self):
     self.response.out.write(template.render('help.html', None))
 
+class Stats(webapp.RequestHandler):
+  def get(self):
+    tusers = TwitterUser.all().filter(
+                'tweetCount >', 0).order('-tweetCount').fetch(10)
+    values = {
+      'highestTweeters' : tusers
+      }
+    self.response.out.write(template.render('stats.html', values))
+
 application = webapp.WSGIApplication([
   ('/', MainPage),
   ('/about', AboutPage),
   ('/help', HelpPage),
   ('/update', UpdateTwitter),
+  ('/stats', Stats),
   ('/oauth/(.*)/(.*)', OAuthHandler),
 ], debug=True)
 
