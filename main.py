@@ -91,6 +91,7 @@ class TwitterUser(db.Model):
   basic_auth = db.StringProperty()
   phonenumber = db.StringProperty()
   active = db.IntegerProperty(default = 0)
+  tweetCount = db.IntegerProperty(default = 0)
   accessTokenid = db.StringProperty()
 
   @staticmethod
@@ -290,6 +291,10 @@ class UpdateTwitter(webapp.RequestHandler):
     except urllib2.URLError, e:
       logging.error("Update: Post to twitter failed\n")
       self.response.out.write("Server error while posting the status. Try again later\n")
+    except urlfetch.DownloadError,  e:
+      logging.error("Update: Pist to twitter failed. %s " % e)
+      msg = "Twitter is having it's fail whale moment. So could you try again later?"
+
 
     return updated
 
@@ -354,6 +359,9 @@ class UpdateTwitter(webapp.RequestHandler):
       if updated:
         dstat = DailyStat.get_by_date()
         dstat.new_tweet()
+
+        tuser.tweetCount += 1
+        tuser.save
 
       stats = Stats.singleton()
       stats.counter += 1
