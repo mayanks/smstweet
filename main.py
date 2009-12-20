@@ -361,7 +361,7 @@ class UpdateTwitter(webapp.RequestHandler):
         dstat.new_tweet()
 
         tuser.tweetCount += 1
-        tuser.save
+        tuser.put()
 
       stats = Stats.singleton()
       stats.counter += 1
