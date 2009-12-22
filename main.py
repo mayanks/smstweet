@@ -192,17 +192,17 @@ class MainPage(webapp.RequestHandler):
         else:
           logging.error("Could not save the tuser")
   
-        message = "<p>Your phone number %s is registered. Start tweeting using your phone</p><p>Would you like to change this number?</p><form action='/' method='post'> New Phone Number : +91<input type=text name='phoneno' value=''></input><input type='submit' value='Change'></form>" % phoneno
+        message = "<p>Your phone number <span class='nos'>%s</span> is registered. Start tweeting using your phone</p><p>Would you like to change this number?</p><form action='/' method='post'><label for='phoneno'>New Phone Number: +91</label><input type=text name='phoneno' value=''></input><input type='submit' value='Change'></form>" % phoneno
       else:
         # case 2
         # phoneno is not there, so this is get request. display the phone number
         if tuser:
           # case 2.1
           ph = tuser.phonenumber
-          message = "<p>You are tweeting currently using phone number %s</p><p>Would you like to change this number?</p><form action='/' method='post'> New Phone Number : +91<input type=text name='phoneno' value=''></input><input type='submit' value='Change'></form>" % ph
+          message = "<p>You are tweeting currently using phone number <span class='nos'>%s</span></p><p>Would you like to change this number?</p><form action='/' method='post'><label for='phoneno'>New Phone Number: +91</label><input type=text name='phoneno' value=''></input><input type='submit' value='Change'></form>" % ph
         else:
           # case 2.2
-          message = "<p>Please provide the phone number using which you would like to tweet</p><form action='/' method='post'> Phone Number : +91<input type=text name='phoneno' value=''></input><input type='submit' value='Add'></form>"
+          message = "<p>Please provide the phone number using which you would like to tweet</p><form action='/' method='post'> <label for='phoneno'>Phone Number : +91</label><input type=text name='phoneno' value=''></input><input type='submit' value='Add'></form>"
 
     #if user_name:
     #  message = "Dear %s,<br>%s" % (user_name, message)
