@@ -427,6 +427,10 @@ class HelpPage(webapp.RequestHandler):
   def get(self):
     self.response.out.write(template.render('help.html', None))
 
+class LatestPage(webapp.RequestHandler):
+  def get(self):
+    self.response.out.write(template.render('latest.html', None))
+
 class Statistics(webapp.RequestHandler):
   def get(self):
     tusers = TwitterUser.all().filter(
@@ -440,6 +444,7 @@ application = webapp.WSGIApplication([
   ('/', MainPage),
   ('/about', AboutPage),
   ('/help', HelpPage),
+  ('/latest', LatestPage),
   ('/update', UpdateTwitter),
   ('/stats', Statistics),
   ('/oauth/(.*)/(.*)', OAuthHandler),

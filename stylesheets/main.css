@@ -171,6 +171,12 @@ input[type="submit"] {
  color: #0000ff;
 }
 
+.date {
+  color: #999;
+  text-align: justify;
+  padding: 0 2px;  
+}
+
 ul {
   list-style: none;
   margin: 15px 0;
