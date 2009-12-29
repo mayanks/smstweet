@@ -247,11 +247,16 @@ class UpdateTwitter(webapp.RequestHandler):
     status_update = { 'status' : status }
     try:
       info = client.post('/statuses/update', 'POST', (200,401), status=status)  # TODO : this may fail, try three times 
-      logging.debug("updated the status")
-      updated = True
+      if 'error' in info:
+        logging.error("Submiting failed as credentials were incorrect (user:%s) %s", tuser.user, info['error'])
+        self.response.out.write('It appears that your OAuth credentials are incorrect. Can you re-register with SMSTweet again? Sorry for the trouble')
+        keys = info.keys()
+        for kw in keys: logging.debug("%s : %s", kw, info[kw])
+        return
+      else:
+        logging.debug("updated the status for user %s", tuser.user)
+        updated = True
 
-      #keys = info.keys()
-      #for kw in keys: logging.debug("%s : %s", kw, info[kw])
     except (urlfetch.DownloadError, ValueError), e:
       logging.error("Update:update could not be fetched. %s " % e)
       msg = "Twitter is having it's fail whale moment, so could not send your message. Can you try again later?"
@@ -280,7 +285,7 @@ class UpdateTwitter(webapp.RequestHandler):
     status_update = "status=%s" % status
 
     try:
-      logging.debug("sending message %s to twitter",status_update)
+      logging.debug("sending message to twitter, user:%s", tuser.user)
       resp = urlfetch.fetch('http://twitter.com/statuses/update.json',
           status_update,
           urlfetch.POST,
@@ -444,7 +449,7 @@ application = webapp.WSGIApplication([
   ('/', MainPage),
   ('/about', AboutPage),
   ('/help', HelpPage),
-  ('/latest', LatestPage),
+  ('/news', LatestPage),
   ('/update', UpdateTwitter),
   ('/stats', Statistics),
   ('/oauth/(.*)/(.*)', OAuthHandler),
