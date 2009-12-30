@@ -92,6 +92,13 @@ class Stats(db.Model):
       s.put()
     return s
 
+class Tweet(db.Model):
+  screen_name = db.StringProperty()
+  profile_image_url = db.StringProperty()
+  status = db.TextProperty()
+  name = db.StringProperty()
+  created_at = db.DateTimeProperty(auto_now_add = True)
+
 class TwitterUser(db.Model):
   user = db.StringProperty()
   basic_auth = db.StringProperty()
@@ -256,6 +263,11 @@ class UpdateTwitter(webapp.RequestHandler):
       else:
         logging.debug("updated the status for user %s", tuser.user)
         updated = True
+        tweet = Tweet(screen_name = info['user']['screen_name'],
+                      name = info['user']['name'],
+                      status = info['text'],
+                      profile_image_url = info['user']['profile_image_url'])
+        tweet.put()
 
     except (urlfetch.DownloadError, ValueError), e:
       logging.error("Update:update could not be fetched. %s " % e)
@@ -303,7 +315,7 @@ class UpdateTwitter(webapp.RequestHandler):
       logging.error("Update: Post to twitter failed\n")
       self.response.out.write("Server error while posting the status. Try again later\n")
     except urlfetch.DownloadError,  e:
-      logging.error("Update: Pist to twitter failed. %s " % e)
+      logging.error("Update: Post to twitter failed. %s " % e)
       msg = "Twitter is having it's fail whale moment. So could you try again later?"
 
 
@@ -440,8 +452,10 @@ class Statistics(webapp.RequestHandler):
   def get(self):
     tusers = TwitterUser.all().filter(
                 'tweetCount >', 0).order('-tweetCount').fetch(10)
+    tweets = Tweet.all().order('-created_at').fetch(10)
     values = {
-      'highestTweeters' : tusers
+      'highestTweeters' : tusers,
+      'tweets' : tweets
       }
     self.response.out.write(template.render('stats.html', values))
 

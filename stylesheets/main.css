@@ -215,3 +215,15 @@ a:hover {
   color:  #222;
   text-decoration:  none;
 }
+
+div.avatar {
+  float:left;
+}
+div.avatar img {
+  height: 48px;
+  width: 49px;
+}
+.tweeter {
+  font-weight: bold;
+  color: #003DE8;
+}

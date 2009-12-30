@@ -2,7 +2,7 @@
 
 {% block content %}
 
-      <div class="col_8">
+      <div class="col_6">
         <h3>
           Higheset SmsTweet Users
         </h3>
@@ -16,10 +16,25 @@
         </ul>
         </p>
       </div>
-      <div class="col_6">
+      <div class="col_8">
         <h3>
+          Recent SMSTweets
         </h3>
         <p>
+        <ul>
+          {% for t in tweets %}
+          <li>
+          <div class="avatar">
+            <a href="http://twitter.com/{{t.screen_name}}" title="{{t.name}}"><img src="{{t.profile_image_url}}"></a>
+          </div>
+          <div class="tweet">
+            <a class="tweeter" href="http://twitter.com/{{t.screen_name}}" title="{{t.name}}">{{t.screen_name}}</a> 
+            {{t.status}}
+          </div>
+          <div style="clear:both"></div>
+          </li>
+          {% endfor %}
+        </ul>
         </p>
         <p>
         </p>
