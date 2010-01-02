@@ -34,6 +34,8 @@ from twitter_oauth_handler import OAuthClient
 from twitter_oauth_handler import OAuthHandler
 from twitter_oauth_handler import OAuthAccessToken
 
+from demjson import decode as decode_json
+
 class IST(datetime.tzinfo):
   def utcoffset(self,dt):
     return datetime.timedelta(hours=5, minutes=30)
@@ -304,9 +306,15 @@ class UpdateTwitter(webapp.RequestHandler):
           request_headers, deadline = 10)
 
       if resp.status_code == 200:
-        logging.debug("successfully updated the message %s", resp.content)
-        self.response.out.write("Successfully sent the twitter status\n")
+        self.response.out.write("Seems that you've signed in over mobile. You will have more flexibility if you sign up on http://smstweet.in\n")
+        info = decode_json(resp.content)
+        logging.debug("successfully updated the message with API for %s", tuser.user)
         updated = True
+        tweet = Tweet(screen_name = info['user']['screen_name'],
+                      name = info['user']['name'],
+                      status = info['text'],
+                      profile_image_url = info['user']['profile_image_url'])
+        tweet.put()
       else:
         logging.error("Submiting failed %d and response %s\n", resp.status_code,resp.content) 
         self.response.out.write("%d error while updating your status with twitter. Try again later\n" % resp.status_code)
