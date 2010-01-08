@@ -367,13 +367,13 @@ class UpdateTwitter(webapp.RequestHandler):
     #  logging.debug("Request_header[%s] = %s", kw, self.request.headers[kw])
     logging.debug("Request received from %s", self.request.remote_addr)
 
-    #if re.match("^Java", self.request.headers['User-Agent'], re.I) is None:
-    #  logging.error("Looks like someone's trying to fake the update request")
-    #  for kw in self.request.headers.keys():
-    #    logging.error("Request_header[%s] = %s", kw, self.request.headers[kw])
-    #  logging.error("Request received from %s", self.request.remote_addr)
-    #  self.response.out.write("Your mode of updating the tweet message looks suspicious. We will investigate and update you if required.")
-    #  return
+    if re.match("^Java", self.request.headers['User-Agent'], re.I) is None:
+      logging.error("Looks like someone's trying to fake the update request")
+      for kw in self.request.headers.keys():
+        logging.error("Request_header[%s] = %s", kw, self.request.headers[kw])
+      logging.error("Request received from %s", self.request.remote_addr)
+      self.response.out.write("Your mode of updating the tweet message looks suspicious. We will investigate and update you if required.")
+      return
 
     # Check if the phoneno is registerd and is active
     tuser = TwitterUser.get_by_phonenumber(phoneno)
