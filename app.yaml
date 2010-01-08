@@ -11,10 +11,18 @@ handlers:
 - url: /images
   static_dir: images
   
+- url: /test
+  script: main.py
+  login: admin
+
 - url: .*
   script: main.py
 
 - url: /favicon.ico
-  static_files: favicon.ico
-  upload: favicon.ico
+  static_files: images/favicon.ico
+  upload: images/favicon.ico
+
+- url: /remote_api
+  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
+  login: admin
 
