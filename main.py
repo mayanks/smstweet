@@ -33,6 +33,7 @@ from google.appengine.api.datastore_errors import Timeout
 from twitter_oauth_handler import OAuthClient
 from twitter_oauth_handler import OAuthHandler
 from twitter_oauth_handler import OAuthAccessToken
+from tuser import TwitterUser
 
 from demjson import decode as decode_json
 
@@ -88,11 +89,28 @@ class Stats(db.Model):
 
   @classmethod
   def singleton(cls):
-    s = Stats.get_by_key_name('key__stats')
-    if not s:
-      s = Stats(key_name = 'key__stats')
-      s.put()
-    return s
+    try:
+      s = Stats.get_by_key_name('key__stats')
+      if not s:
+        s = Stats(key_name = 'key__stats')
+        s.put()
+      return s
+    except Timeout, e:
+      logging.warning("Timedout (singleton): Never mind")
+      return Stats()
+  
+  @classmethod
+  def updateCounter(cls,user):
+    try:
+      stats = Stats.get_by_key_name('key__stats')
+      stats.counter += 1
+      if user not in stats.recentTweeters:
+        stats.recentTweeters.insert(0,user)
+        stats.recentTweeters.pop()
+      stats.put()
+
+    except Timeout, e:
+      logging.warning("Timedout (updateCounter): Never mind")
 
 class Tweet(db.Model):
   screen_name = db.StringProperty()
@@ -101,50 +119,20 @@ class Tweet(db.Model):
   name = db.StringProperty()
   created_at = db.DateTimeProperty(auto_now_add = True)
 
-class TwitterUser(db.Model):
-  user = db.StringProperty()
-  basic_auth = db.StringProperty()
-  phonenumber = db.StringProperty()
-  active = db.IntegerProperty(default = 0)
-  tweetCount = db.IntegerProperty(default = 0)
-  accessTokenid = db.StringProperty()
-
-  @staticmethod
-  def __key_name(phnum):
-    return "key_%s" % phnum.replace("+","")
-
-  @classmethod
-  def get_by_phonenumber(cls, phnum):
-    return TwitterUser.get_by_key_name(TwitterUser.__key_name(phnum))
-
-  @classmethod
-  def create_by_phonenumber(cls, phnum, user, passwd = None):
-    basic_auth = None
-    if passwd:
-      basic_auth = base64.encodestring('%s:%s' % (user, passwd))[:-1]
-    tu = TwitterUser(key_name=TwitterUser.__key_name(phnum), user = user, basic_auth = basic_auth , phonenumber = phnum , active = 1)
-    k = tu.put()
-
-    # New user has joined in. Follow him and post a welcome message
-    sms_client = OAuthClient('twitter', cls)
-    sms_client.token = OAuthAccessToken.all().filter(
-                'specifier =', 'smstweetin').filter(
-                'service =', 'twitter').fetch(1)[0]
-
-    try:
-      info = sms_client.post('/friendships/create', 'POST', (200,401,403), screen_name=user)  # TODO : this may fail, try three times 
-      # Stop sending the follow status
-      #status = "@%s has started using SMSTweet. Welcome %s to the group and tell about us to your friends" % (user, user)
-      #info = sms_client.post('/statuses/update', 'POST', (200,401), status=status)  # TODO : this may fail, try three times 
-    except (urlfetch.DownloadError, ValueError), e:
-      logging.error("SmsTweetin:Friendship/create failed %s" % e)
-
-    return tu
-
 def is_development():
     logging.debug("server software = %s" % os.environ['SERVER_SOFTWARE'])
     return os.environ['SERVER_SOFTWARE'].startswith('Development')
     
+def save_tweet(info):
+  tweet = Tweet(screen_name = info['user']['screen_name'],
+                name = info['user']['name'],
+                status = info['text'],
+                profile_image_url = info['user']['profile_image_url'])
+  try:
+    tweet.put()
+  except Timeout, e:
+    logging.warning("Timedout (save_tweet). Never mind")
+
 class MainPage(webapp.RequestHandler):
   def head(self):
     return
@@ -172,7 +160,10 @@ class MainPage(webapp.RequestHandler):
           user_name = info['screen_name']
       except (urlfetch.DownloadError, ValueError), e:
         server_error = True
-        logging.error("Home:Credentials could not be fetched. %s " % e)
+        logging.warning("Home:Credentials could not be fetched. %s " % e)
+      except Timeout, e:
+        server_error = True
+        logging.warning("Timedout(Home) : Never mind")
 
     if user_name:
       tuser = None
@@ -201,17 +192,17 @@ class MainPage(webapp.RequestHandler):
         else:
           logging.error("Could not save the tuser")
   
-        message = "<p>Your phone number <span class='nos'>%s</span> is registered. Start tweeting using your phone</p><p>Would you like to change this number?</p><form action='/' method='post'><label for='phoneno'>New Phone Number: +91</label><input type=text name='phoneno' value=''></input><input type='submit' value='Change'></form>" % phoneno
+        message = "<p>Your phone number <span class='nos'>%s</span> is registered. Start tweeting using your phone</p><p>Would you like to change this number?</p><form action='/' method='post'><label for='phoneno'>New Phone Number: +91</label><input type=text name='phoneno' value=''></input><input id='formsubmit' type='submit' value='Change'></form>" % phoneno
       else:
         # case 2
         # phoneno is not there, so this is get request. display the phone number
         if tuser:
           # case 2.1
           ph = tuser.phonenumber
-          message = "<p>You are tweeting currently using phone number <span class='nos'>%s</span></p><p>Would you like to change this number?</p><form action='/' method='post'><label for='phoneno'>New Phone Number: +91</label><input type=text name='phoneno' value=''></input><input type='submit' value='Change'></form>" % ph
+          message = "<p>You are tweeting currently using phone number <span class='nos'>%s</span></p><p>Would you like to change this number?</p><form action='/' method='post'><label for='phoneno'>New Phone Number: +91</label><input type=text name='phoneno' value=''></input><input id='formsubmit' type='submit' value='Change'></form>" % ph
         else:
           # case 2.2
-          message = "<p>Please provide the phone number using which you would like to tweet</p><form action='/' method='post'> <label for='phoneno'>Phone Number : +91</label><input type=text name='phoneno' value=''></input><input type='submit' value='Add'></form>"
+          message = "<p>Please provide the phone number using which you would like to tweet</p><form action='/' method='post'> <label for='phoneno'>Phone Number : +91</label><input type=text name='phoneno' value=''></input><input id='formsubmit' type='submit' value='Add'></form>"
 
     #if user_name:
     #  message = "Dear %s,<br>%s" % (user_name, message)
@@ -245,12 +236,24 @@ class UpdateTwitter(webapp.RequestHandler):
     updated = False
     client = OAuthClient('twitter', self)
 
-    client.token = OAuthAccessToken.all().filter(
-                'specifier =', tuser.user).filter(
-                'service =', 'twitter').fetch(1)[0]
-
     if len(status) == 0:
       self.response.out.write('Dude, where is the status message to post? Pressed the send button to fast?')
+      return
+
+    count = 0
+    while count < 3:
+      try:
+        client.token = OAuthAccessToken.all().filter(
+                'specifier =', tuser.user).filter(
+                'service =', 'twitter').fetch(1)[0]
+        break
+      except Timeout, e:
+        logging.warning("Timedout(updateStatuswithToken): Trying again")
+        count += 1
+
+    if client.token == None:
+      logging.error("Could not fetch client token in 3 attempts. Giving up")
+      self.response.out.write("SMSTweet is under a heavy load and hence could not tweet your message. Please try again.")
       return
 
     status_update = { 'status' : status }
@@ -265,11 +268,7 @@ class UpdateTwitter(webapp.RequestHandler):
       else:
         logging.debug("updated the status for user %s", tuser.user)
         updated = True
-        tweet = Tweet(screen_name = info['user']['screen_name'],
-                      name = info['user']['name'],
-                      status = info['text'],
-                      profile_image_url = info['user']['profile_image_url'])
-        tweet.put()
+        save_tweet(info)
 
     except (urlfetch.DownloadError, ValueError), e:
       logging.error("Update:update could not be fetched. %s " % e)
@@ -310,11 +309,8 @@ class UpdateTwitter(webapp.RequestHandler):
         info = decode_json(resp.content)
         logging.debug("successfully updated the message with API for %s", tuser.user)
         updated = True
-        tweet = Tweet(screen_name = info['user']['screen_name'],
-                      name = info['user']['name'],
-                      status = info['text'],
-                      profile_image_url = info['user']['profile_image_url'])
-        tweet.put()
+        save_tweet(info)
+
       else:
         logging.error("Submiting failed %d and response %s\n", resp.status_code,resp.content) 
         self.response.out.write("%d error while updating your status with twitter. Try again later\n" % resp.status_code)
@@ -371,13 +367,13 @@ class UpdateTwitter(webapp.RequestHandler):
     #  logging.debug("Request_header[%s] = %s", kw, self.request.headers[kw])
     logging.debug("Request received from %s", self.request.remote_addr)
 
-    if re.match("^Java", self.request.headers['User-Agent'], re.I) is None:
-      logging.error("Looks like someone's trying to fake the update request")
-      for kw in self.request.headers.keys():
-        logging.error("Request_header[%s] = %s", kw, self.request.headers[kw])
-      logging.error("Request received from %s", self.request.remote_addr)
-      self.response.out.write("Your mode of updating the tweet message looks suspicious. We will investigate and update you if required.")
-      return
+    #if re.match("^Java", self.request.headers['User-Agent'], re.I) is None:
+    #  logging.error("Looks like someone's trying to fake the update request")
+    #  for kw in self.request.headers.keys():
+    #    logging.error("Request_header[%s] = %s", kw, self.request.headers[kw])
+    #  logging.error("Request received from %s", self.request.remote_addr)
+    #  self.response.out.write("Your mode of updating the tweet message looks suspicious. We will investigate and update you if required.")
+    #  return
 
     # Check if the phoneno is registerd and is active
     tuser = TwitterUser.get_by_phonenumber(phoneno)
@@ -411,15 +407,10 @@ class UpdateTwitter(webapp.RequestHandler):
           dstat = DailyStat.get_by_date()
           dstat.failed_tweet()
 
-        stats = Stats.singleton()
-        stats.counter += 1
-        if tuser.user not in stats.recentTweeters:
-          stats.recentTweeters.insert(0,tuser.user)
-          stats.recentTweeters.pop()
-        stats.put()
-
+        Stats.updateCounter(tuser.user)
+        
       except Timeout, e:
-        logging.error("Timed out logging the stats !! never mind")
+        logging.warning("Timed out logging the stats !! never mind")
 
     else:
       m = re.match("^\s*(\S+)\s+(\S+)\s+(\S+)", content)
@@ -433,7 +424,7 @@ class UpdateTwitter(webapp.RequestHandler):
           self.registerUser(phoneno, user_name, passwd)
         else:
           logging.error("unrecognized command %s\n", command) 
-          self.response.out.write("Looks like you've not registered your phone number at http://www.smstweet.in. Sorry can't tweet your message\n") 
+          self.response.out.write("Either you've not registered your phone number at http://www.smstweet.in or we Timed out. Please try again\n") 
       else:
         self.response.out.write("Incorrect syntax. Please sms \"register <username> <passwd>\" Note that password is not being saved")
 
@@ -459,13 +450,26 @@ class LatestPage(webapp.RequestHandler):
 class Statistics(webapp.RequestHandler):
   def get(self):
     tusers = TwitterUser.all().filter(
-                'tweetCount >', 0).order('-tweetCount').fetch(10)
+                'tweetCount >', 0).order('-tweetCount').fetch(20)
     tweets = Tweet.all().order('-created_at').fetch(10)
     values = {
       'highestTweeters' : tusers,
       'tweets' : tweets
       }
     self.response.out.write(template.render('stats.html', values))
+
+class Test(webapp.RequestHandler):
+  def get(self):
+    tusers = TwitterUser.all().fetch(1000)
+    error_users = []
+    for t in tusers:
+      if len(t.phonenumber) != 12:
+        error_users.append(t)
+    values = {
+      'tweeters' : error_users,
+      }
+    self.response.out.write(template.render('test.html', values))
+
 
 application = webapp.WSGIApplication([
   ('/', MainPage),
@@ -474,6 +478,7 @@ application = webapp.WSGIApplication([
   ('/news', LatestPage),
   ('/update', UpdateTwitter),
   ('/stats', Statistics),
+  ('/test', Test),
   ('/oauth/(.*)/(.*)', OAuthHandler),
 ], debug=True)
 
