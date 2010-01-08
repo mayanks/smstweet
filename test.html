@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="col_4">
+  <ul>
+    {% for t in tweeters %}
+    <li>
+    <a href="http://twitter.com/{{t.user}}" title="@{{t.user}}'s Twitter profile">@{{t.user}}</a> : {{t.phonenumber}} :
+    </li>
+    {% endfor %} 
+</ul>
+</div>
+<br />
+{% endblock %}
+
