@@ -273,3 +273,12 @@ div.avatar img {
   color: #003DE8;
   display: block;
 }
+
+.flash-msg {
+  background-color:#BCBCD0;
+  color:#990099;
+  font-weight:bold;
+  margin:5px 10px;
+  padding:5px 10px;
+}
+

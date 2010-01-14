@@ -203,7 +203,9 @@ class OAuthClient(object):
         return self.get_request_token()
       except (urlfetch.DownloadError, ValueError), e:
         logging.warning("Twitter/login: Failed. redirectin to the home page" )
-        self.redirect("http://www.smstweet.in", permanent=False)
+        flash = Flash()
+        flash.msg = "Twitter is not responding currently. Please try again in some time. Hopefully it will be up."
+        self.redirect("/")
 
 
     def logout(self, return_to='/'):
@@ -357,10 +359,16 @@ class OAuthHandler(RequestHandler):
 
         client = OAuthClient(service, self)
 
-        if action in client.__public__:
+        try:
+          if action in client.__public__:
             self.response.out.write(getattr(client, action)())
-        else:
+          else:
             self.response.out.write(client.login())
+        except (urlfetch.DownloadError, ValueError, Timeout), e:
+          logging.warning("Twitter:%s failed  :%s" % (action,e))
+          flash = Flash()
+          flash.msg = "Twitter is not responding currently. Please try again in some time. Hopefully it will be up."
+          self.redirect("/")
 
 # ------------------------------------------------------------------------------
 # modify this demo MainHandler to suit your needs

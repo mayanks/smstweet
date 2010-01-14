@@ -2,6 +2,9 @@
 
 {% block content %}
 
+      {% if flash.msg %}
+        <div class="flash-msg">{{flash.msg}}</div>
+      {% endif %}
       <div class="col_4">
         <h3>
           What is <em>sms</em>tweet?

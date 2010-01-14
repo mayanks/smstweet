@@ -37,6 +37,7 @@ from twitter_oauth_handler import OAuthAccessToken
 from tuser import TwitterUser
 
 from demjson import decode as decode_json
+from flash import Flash
 
 class IST(datetime.tzinfo):
   def utcoffset(self,dt):
@@ -216,11 +217,14 @@ class MainPage(webapp.RequestHandler):
       user_name = 'dummy'
       message = '<p>Twitter is having it\'s Fail Whale moment. Please try again after some time. Hopefully things should be back up.</p>'
 
+    flash = Flash()
+
     values = {
       'user_name' : user_name,
       'message' : message,
       'counter' : stats.counter,
-      'recentTweeters' : stats.recentTweeters
+      'recentTweeters' : stats.recentTweeters,
+      'flash' : flash
       }
     self.response.out.write(template.render('main.html', values))
 
