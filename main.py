@@ -337,7 +337,9 @@ class UpdateTwitter(webapp.RequestHandler):
 
       if resp.status_code == 200:
         logging.debug("user name and password are correct for %s", user_name)
-        tuser = TwitterUser.create_by_phonenumber(phoneno, resp['screen_name'], passwd)
+        info = decode_json(resp.content)
+        tuser = TwitterUser.create_by_phonenumber(phoneno, info['screen_name'], passwd)
+        logging.debug("Stored user_name %s as against provided user name %s" % (info['screen_name'], user_name))
         dstat = DailyStat.get_by_date()
         dstat.new_user()
 
