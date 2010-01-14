@@ -193,6 +193,7 @@ class OAuthClient(object):
 
     def login(self):
 
+      try:
         proxy_id = self.get_cookie()
 
         if proxy_id:
@@ -200,6 +201,10 @@ class OAuthClient(object):
             self.expire_cookie()
 
         return self.get_request_token()
+      except (urlfetch.DownloadError, ValueError), e:
+        logging.warning("Twitter/login: Failed. redirectin to the home page" )
+        self.redirect("http://www.smstweet.in", permanent=False)
+
 
     def logout(self, return_to='/'):
         self.expire_cookie()

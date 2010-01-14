@@ -13,6 +13,7 @@ from google.appengine.ext import webapp
 from google.appengine.api import urlfetch
 from google.appengine.ext.webapp import template
 from google.appengine.api.datastore_errors import Timeout
+from google.appengine.api.labs import taskqueue
 
 from twitter_oauth_handler import OAuthClient
 from twitter_oauth_handler import OAuthHandler
@@ -39,8 +40,9 @@ class TwitterUser(db.Model):
       try:
         return TwitterUser.get_by_key_name(TwitterUser.__key_name(phnum))
       except Timeout, e:
-        logging.error("Timedout. Will try again")
+        logging.warning("Timedout. Will try again")
         count += 1
+    logging.error("Timedout (get_by_phonenumber). after 3 attempts")
     return None # Timed out after 3 attempts
 
   @classmethod
@@ -52,18 +54,7 @@ class TwitterUser(db.Model):
     k = tu.put()
 
     # New user has joined in. Follow him and post a welcome message
-    sms_client = OAuthClient('twitter', cls)
-    sms_client.token = OAuthAccessToken.all().filter(
-                'specifier =', 'smstweetin').filter(
-                'service =', 'twitter').fetch(1)[0]
-
-    try:
-      info = sms_client.post('/friendships/create', 'POST', (200,401,403), screen_name=user)  # TODO : this may fail, try three times 
-      # Stop sending the follow status
-      #status = "@%s has started using SMSTweet. Welcome %s to the group and tell about us to your friends" % (user, user)
-      #info = sms_client.post('/statuses/update', 'POST', (200,401), status=status)  # TODO : this may fail, try three times 
-    except (urlfetch.DownloadError, ValueError), e:
-      logging.error("SmsTweetin:Friendship/create failed %s" % e)
+    taskqueue.add(url = '/follow_new_user', params = { 'screen_name' : user, 'count' : 1 })
 
     return tu
 

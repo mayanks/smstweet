@@ -29,6 +29,7 @@ from google.appengine.ext import webapp
 from google.appengine.api import urlfetch
 from google.appengine.ext.webapp import template
 from google.appengine.api.datastore_errors import Timeout
+from google.appengine.api.labs import taskqueue
 
 from twitter_oauth_handler import OAuthClient
 from twitter_oauth_handler import OAuthHandler
@@ -285,7 +286,7 @@ class UpdateTwitter(webapp.RequestHandler):
           if 'text' in info[0]:
             msg = "%s: %s" % (info[0]['user']['screen_name'], info[0]['text'])
       except (urlfetch.DownloadError, ValueError), e:
-        logging.error("Update:mentions could not be fetched. %s " % e)
+        logging.warning("Update:mentions could not be fetched. %s " % e)
         msg = "Twitter is having it's fail whale moment, but I guess I managed to post your status."
 
     self.response.out.write(msg)
@@ -336,7 +337,7 @@ class UpdateTwitter(webapp.RequestHandler):
 
       if resp.status_code == 200:
         logging.debug("user name and password are correct for %s", user_name)
-        tuser = TwitterUser.create_by_phonenumber(phoneno, user_name, passwd)
+        tuser = TwitterUser.create_by_phonenumber(phoneno, resp['screen_name'], passwd)
         dstat = DailyStat.get_by_date()
         dstat.new_user()
 
@@ -470,6 +471,32 @@ class Test(webapp.RequestHandler):
       }
     self.response.out.write(template.render('test.html', values))
 
+class FollowNewUser(webapp.RequestHandler):
+  def get(self):
+    # New user has joined in. Follow him and post a welcome message
+    try:
+      sms_client = OAuthClient('twitter', self)
+      sms_client.token = OAuthAccessToken.all().filter(
+                'specifier =', 'smstweetin').filter(
+                'service =', 'twitter').fetch(1)[0]
+
+      user = self.request.get('screen_name')
+      count = int(self.request.get('count'))
+      info = sms_client.post('/friendships/create', 'POST', (200,401,403), screen_name=user)  # TODO : this may fail, try three times 
+      # Stop sending the follow status
+      #status = "@%s has started using SMSTweet. Welcome %s to the group and tell about us to your friends" % (user, user)
+      #info = sms_client.post('/statuses/update', 'POST', (200,401), status=status)  # TODO : this may fail, try three times 
+    except (urlfetch.DownloadError, ValueError, Timeout), e:
+      logging.warning("SmsTweetin:Friendship/create failed (%d) %s" % (count,e))
+      if count > 10:
+        logging.error("SmsTweetin:Friendship/create Finally giving up")
+      else:
+        # Try again
+        taskqueue.add(url = '/follow_new_user', params = { 'screen_name' : user, 'count' : count + 1 })
+
+    self.response.out.write("DONE")
+
+  post = get
 
 application = webapp.WSGIApplication([
   ('/', MainPage),
@@ -479,6 +506,7 @@ application = webapp.WSGIApplication([
   ('/update', UpdateTwitter),
   ('/stats', Statistics),
   ('/test', Test),
+  ('/follow_new_user', FollowNewUser),
   ('/oauth/(.*)/(.*)', OAuthHandler),
 ], debug=True)
 
