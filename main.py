@@ -457,7 +457,7 @@ class LatestPage(webapp.RequestHandler):
 class Statistics(webapp.RequestHandler):
   def get(self):
     tusers = TwitterUser.all().filter(
-                'tweetCount >', 0).order('-tweetCount').fetch(20)
+                'tweetCount >', 0).order('-tweetCount').fetch(40)
     tweets = Tweet.all().order('-created_at').fetch(10)
     values = {
       'highestTweeters' : tusers,

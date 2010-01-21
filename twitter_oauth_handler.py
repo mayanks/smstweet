@@ -37,7 +37,7 @@ sys.path.insert(0, join_path(dirname(__file__), 'lib')) # extend sys.path
 
 from demjson import decode as decode_json
 
-from google.appengine.api.urlfetch import fetch as urlfetch, GET, POST
+from google.appengine.api.urlfetch import fetch as urlfetch, GET, POST, DownloadError
 from google.appengine.ext import db
 from google.appengine.ext.webapp import RequestHandler, WSGIApplication
 
@@ -201,7 +201,7 @@ class OAuthClient(object):
             self.expire_cookie()
 
         return self.get_request_token()
-      except (urlfetch.DownloadError, ValueError), e:
+      except (DownloadError, ValueError), e:
         logging.warning("Twitter/login: Failed. redirectin to the home page" )
         flash = Flash()
         flash.msg = "Twitter is not responding currently. Please try again in some time. Hopefully it will be up."
@@ -364,7 +364,7 @@ class OAuthHandler(RequestHandler):
             self.response.out.write(getattr(client, action)())
           else:
             self.response.out.write(client.login())
-        except (urlfetch.DownloadError, ValueError, Timeout), e:
+        except (DownloadError, ValueError, Timeout), e:
           logging.warning("Twitter:%s failed  :%s" % (action,e))
           flash = Flash()
           flash.msg = "Twitter is not responding currently. Please try again in some time. Hopefully it will be up."

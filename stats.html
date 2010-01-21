@@ -7,13 +7,13 @@
           Top <em>sms</em>tweeters
         </h3>
         <p>
-        <ul>
+        <ol>
           {% for t in highestTweeters %}
           <li>
           <a href="http://twitter.com/{{t.user}}" title="@{{t.user}}'s Twitter profile">@{{t.user}}</a> : {{t.tweetCount}}
           </li>
           {% endfor %}
-        </ul>
+        </ol>
         </p>
       </div>
       <div class="col_8">
