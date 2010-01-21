@@ -275,9 +275,11 @@ div.avatar img {
 }
 
 .flash-msg {
-  background-color:#BCBCD0;
-  color:#990099;
+  background-color:#fff;
+  color:#000;
   font-weight:bold;
+  font-family: "Times New Roman", Serif;
+  font-size: 16px;
   margin:5px 10px;
   padding:5px 10px;
 }
