@@ -40,6 +40,7 @@ from demjson import decode as decode_json
 from google.appengine.api.urlfetch import fetch as urlfetch, GET, POST, DownloadError
 from google.appengine.ext import db
 from google.appengine.ext.webapp import RequestHandler, WSGIApplication
+from google.appengine.api.datastore_errors import Timeout
 
 # ------------------------------------------------------------------------------
 # configuration -- SET THESE TO SUIT YOUR APP!!
@@ -144,6 +145,23 @@ class OAuthClient(object):
         self.token = None
 
     # public methods
+
+    def token_for_user(self, user_name):
+      count = 0
+      while count < 3:
+        try:
+          token = OAuthAccessToken.all().filter(
+                  'specifier =', user_name).filter(
+                  'service =', 'twitter').fetch(1)[0]
+          break
+        except Timeout, e:
+          logging.warning("Timedout(updateStatuswithToken): Trying again")
+          count += 1
+
+      if token == None:
+        logging.error("Could not fetch client token in 3 attempts. Giving up")
+      return token
+
 
     def get(self, api_method, http_method='GET', expected_status=(200,), **extra_params):
 

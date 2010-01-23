@@ -28,6 +28,8 @@ class TwitterUser(db.Model):
   active = db.IntegerProperty(default = 0)
   tweetCount = db.IntegerProperty(default = 0)
   accessTokenid = db.StringProperty()
+  location = db.StringProperty(default = "")
+  carrier = db.StringProperty(default = "")
 
   @staticmethod
   def __key_name(phnum):
@@ -58,4 +60,9 @@ class TwitterUser(db.Model):
 
     return tu
 
+  def incr_counter(self, location = None, carrier = None):
+    self.tweetCount += 1
+    if location: self.location = location
+    if carrier:  self.carrier = carrier
+    self.put()
 
