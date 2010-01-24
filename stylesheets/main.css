@@ -82,7 +82,7 @@ a img {
   margin: 18px 10px;
 }
 div#header {
-  margin-top: 30px;
+  margin-top: 5px;
 }
 
 div#content {
@@ -106,7 +106,7 @@ div#nav ul li {
   text-align:  left;
   width: 12%;
   margin: 15px 0;
-  padding-top: 25px;
+  padding-top: 52px;
   padding-left: 50px;
 }
 
@@ -145,7 +145,6 @@ html>body {
 }
 
 h1#logo {
-  margin-top: 35px;
   margin-bottom: 10px;
 }
 
