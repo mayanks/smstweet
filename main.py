@@ -344,7 +344,7 @@ class UpdateTwitter(webapp.RequestHandler):
 
         self.response.out.write("Congratulations !! Your twitter username is registered. Go ahead and send a twitter message by SMSing \"tweet <your twitter status\"")
       else:
-        logging.error("Submiting failed %d and response %s\n", resp.status_code,resp.content) 
+        logging.warning("Submiting failed %d and response %s\n", resp.status_code,resp.content) 
         self.response.out.write("Incorrect username/password. Note that both username and password are case sensitive. Better register online at http://www.smstweet.in") 
 
     except urllib2.URLError, e:
@@ -424,7 +424,7 @@ class UpdateTwitter(webapp.RequestHandler):
         if command == 'register':
           self.registerUser(phoneno, user_name, passwd)
         else:
-          logging.error("unrecognized command %s\n", command) 
+          logging.warning("unrecognized command %s\n", command) 
           self.response.out.write("Either you've not registered your phone number at http://www.smstweet.in or we Timed out. Please try again\n") 
       else:
         self.response.out.write("Incorrect syntax. Please sms \"register <username> <passwd>\" Note that password is not being saved")
