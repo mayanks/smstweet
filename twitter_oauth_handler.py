@@ -22,6 +22,7 @@ I hope you find this useful, tav
 # Released into the Public Domain by tav@espians.com
 
 import sys
+import logging
 
 from datetime import datetime, timedelta
 from hashlib import sha1
