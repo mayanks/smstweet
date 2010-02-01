@@ -37,6 +37,7 @@ from wsgiref.handlers import CGIHandler
 sys.path.insert(0, join_path(dirname(__file__), 'lib')) # extend sys.path
 
 from demjson import decode as decode_json
+from flash import Flash
 
 from google.appengine.api.urlfetch import fetch as urlfetch, GET, POST, DownloadError
 from google.appengine.ext import db
