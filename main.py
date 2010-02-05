@@ -136,6 +136,24 @@ def save_tweet(info):
   except Timeout, e:
     logging.warning("Timedout (save_tweet). Never mind")
 
+def authorizedAccess(func):
+  def wrapper(self, *args, **kw):
+    #for kw in self.request.headers.keys():
+    #  logging.debug("Request_header[%s] = %s", kw, self.request.headers[kw])
+    logging.debug("Request received from %s", self.request.remote_addr)
+
+    if re.match("^64.124.122", self.request.remote_addr) is None:
+      logging.error("Looks like someone's trying to fake the sms request")
+      for kw in self.request.headers.keys():
+        logging.error("Request_header[%s] = %s", kw, self.request.headers[kw])
+      logging.error("Request received from %s", self.request.remote_addr)
+      self.response.out.write("Your mode of updating the tweet message looks suspicious. We will investigate and update you if required.")
+      return
+    else:
+      func(self,*args,**kw)
+  return wrapper
+
+
 class MainPage(webapp.RequestHandler):
   def head(self):
     return
@@ -316,6 +334,7 @@ class UpdateTwitter(webapp.RequestHandler):
       logging.error("Register User verify credentials %s " % e)
       self.response.out.write("Server error while posting the status. Please try again. \n")
 
+  @authorizedAccess
   def get(self):
     phonecode = self.request.get('phonecode')
     keyword = self.request.get('keyword')
@@ -325,18 +344,6 @@ class UpdateTwitter(webapp.RequestHandler):
     phoneno = self.request.get('msisdn')
     if phoneno == None or content == None:
       self.response.out.write("Please provide both msisdn and content")
-      return
-
-    #for kw in self.request.headers.keys():
-    #  logging.debug("Request_header[%s] = %s", kw, self.request.headers[kw])
-    logging.debug("Request received from %s", self.request.remote_addr)
-
-    if re.match("^Java", self.request.headers['User-Agent'], re.I) is None:
-      logging.error("Looks like someone's trying to fake the update request")
-      for kw in self.request.headers.keys():
-        logging.error("Request_header[%s] = %s", kw, self.request.headers[kw])
-      logging.error("Request received from %s", self.request.remote_addr)
-      self.response.out.write("Your mode of updating the tweet message looks suspicious. We will investigate and update you if required.")
       return
 
     # Check if the phoneno is registerd and is active
@@ -389,6 +396,7 @@ class UpdateTwitter(webapp.RequestHandler):
         self.response.out.write("Incorrect syntax. Please sms \"register <username> <passwd>\" Note that password is not being saved")
 
 class GetUpdatesFromTwitter(webapp.RequestHandler):
+  @authorizedAccess
   def get(self):
     keyword = self.request.get('keyword')
     content = self.request.get('content')
@@ -396,10 +404,6 @@ class GetUpdatesFromTwitter(webapp.RequestHandler):
     if phoneno == None or content == None:
       self.response.out.write("Please provide both msisdn and content")
       return
-
-    #for kw in self.request.headers.keys():
-    #  logging.debug("Request_header[%s] = %s", kw, self.request.headers[kw])
-    logging.debug("Request received from %s", self.request.remote_addr)
 
     # Check if the phoneno is registerd and is active
     tuser = TwitterUser.get_by_phonenumber(phoneno)
