@@ -22,6 +22,7 @@ import base64
 import os
 import urllib2
 import re
+import random
 
 from google.appengine.ext import db
 from google.appengine.api import users
@@ -245,14 +246,9 @@ class UpdateTwitter(webapp.RequestHandler):
       self.response.out.write('Dude, where is the status message to post? Pressed the send button to fast?')
       return
 
-    client.token = client.token_for_user(tuser.user)
-    if client.token == None:
-      self.response.out.write("SMSTweet is under a heavy load and hence could not tweet your message. Please try again.")
-      return
-
     status_update = { 'status' : status }
     try:
-      info = client.post('/statuses/update', 'POST', (200,401), status=status)  # TODO : this may fail, try three times 
+      info = client.post('/statuses/update', 'POST', (200,401), tuser, status=status)  # TODO : this may fail, try three times 
       if 'error' in info:
         logging.error("Submiting failed as credentials were incorrect (user:%s) %s", tuser.user, info['error'])
         self.response.out.write('It appears that your OAuth credentials are incorrect. Can you re-register with SMSTweet again? Sorry for the trouble')
@@ -272,57 +268,23 @@ class UpdateTwitter(webapp.RequestHandler):
       # Since no exception happened, it is safe to assume that the message was posted
 
       # Get the mentions of the user
-      try:
-        info = client.get('/statuses/mentions', count=1)
-        msg = "could not get any message with your mention"
-        if info and len(info) > 0:
-          if 'text' in info[0]:
-            msg = "%s: %s" % (info[0]['user']['screen_name'], info[0]['text'])
-      except (urlfetch.DownloadError, ValueError), e:
-        logging.warning("Update:mentions could not be fetched. %s " % e)
-        msg = "Twitter is having it's fail whale moment, but I guess I managed to post your status."
+      if random.randint(0,1):
+        try:
+          info = client.get('/statuses/mentions', tuser = tuser,count=1)
+          msg = "could not get any message with your mention"
+          if info and len(info) > 0:
+            if 'text' in info[0]:
+              msg = "%s: %s" % (info[0]['user']['screen_name'], info[0]['text'])
+        except (urlfetch.DownloadError, ValueError), e:
+          logging.warning("Update:mentions could not be fetched. %s " % e)
+          msg = "Twitter is having it's fail whale moment, but I guess I managed to post your status."
+      else:
+        logging.warning("Informed user %s to check TWUP" % tuser.user)
+        msg = "@smstweetin: You know we have added a new feature to get status from your timeline? sms TWUP to get latest tweet. Details at http://smstweet.in/help"
 
     if tuser.tweetCount == 0:
-      msg = "Welcome to SMSTweet and Congrats on posting your first message. If you like this service do vote for it @ShortyAwards http://shortyawards.com/smstweetin"
+      msg = "Welcome to SMSTweet and Congrats on posting your first message. You can sms TWUP to get latest from your timeline. Details at http://smstweet.in/help"
     self.response.out.write(msg)
-    return updated
-
-  def updateStatuswithPasswd(self, tuser, status):
-    updated = False
-    request_headers = {}
-    request_headers['Authorization'] = 'Basic %s' % tuser.basic_auth
-    status_update = "status=%s" % status
-
-    try:
-      logging.debug("sending message to twitter, user:%s", tuser.user)
-      resp = urlfetch.fetch('http://twitter.com/statuses/update.json',
-          status_update,
-          urlfetch.POST,
-          request_headers, deadline = 10)
-
-      if resp.status_code == 200:
-        if tuser.tweetCount == 0:
-          msg = "Welcome to SMSTweet and Congrats on posting your first message. If you like this service do vote for it @ShortyAwards http://shortyawards.com/smstweetin"
-        else:
-          msg = "Seems that you've signed in over mobile. You will have more flexibility if you sign up on http://smstweet.in\n"
-        self.response.out.write(msg)
-        info = decode_json(resp.content)
-        logging.debug("successfully updated the message with API for %s", tuser.user)
-        updated = True
-        save_tweet(info)
-
-      else:
-        logging.error("Submiting failed %d and response %s\n", resp.status_code,resp.content) 
-        self.response.out.write("%d error while updating your status with twitter. Try again later\n" % resp.status_code)
-
-    except urllib2.URLError, e:
-      logging.error("Update: Post to twitter failed\n")
-      self.response.out.write("Server error while posting the status. Try again later\n")
-    except urlfetch.DownloadError,  e:
-      logging.error("Update: Post to twitter failed. %s " % e)
-      msg = "Twitter is having it's fail whale moment. So could you try again later?"
-
-
     return updated
 
   def registerUser(self, phoneno, user_name, passwd):
@@ -392,10 +354,7 @@ class UpdateTwitter(webapp.RequestHandler):
 
       updated = False
       status = content[0:139]  # makes sure status is 140 chars long
-      if tuser.accessTokenid:
-        updated = self.updateStatuswithToken(tuser, status)
-      else:
-        updated = self.updateStatuswithPasswd(tuser, status)
+      updated = self.updateStatuswithToken(tuser, status)
 
       try:
         if updated:
@@ -445,60 +404,52 @@ class GetUpdatesFromTwitter(webapp.RequestHandler):
     # Check if the phoneno is registerd and is active
     tuser = TwitterUser.get_by_phonenumber(phoneno)
     if tuser and tuser.active:
-      if tuser.accessTokenid:
  
-        client = OAuthClient('twitter', self)
-        count = 0
-        client.token = client.token_for_user(tuser.user)
-        if client.token == None:
-          self.response.out.write("SMSTweet is under a heavy load and hence could not tweet your message. Please try again.")
-          return
+      client = OAuthClient('twitter', self)
+      count = 0
 
-        words = re.split("\s+",content)
-        index = 0
-        user_name = None
-        msg = ""
-        if len(words) > 1 and words[1] != None:
-          try:
-            index = int(words[1]) - 1
-            logging.debug("User send a request to get %s(%d)\n" % (words[1], index))
-            if index < 0 or index >= 100: 
-              index = 0
-              msg = "Invalid number %d. Only upto 100 allowed." % int(words[1])
-          except ValueError, e:
-            user_name = words[1].lstrip('@')
-            logging.debug("We are going to get status from %s" % user_name)
-        # Get the mentions of the user
+      words = re.split("\s+",content)
+      index = 0
+      user_name = None
+      msg = ""
+      if len(words) > 1 and words[1] != None:
         try:
-          info = client.get('/statuses/home_timeline',count=100)
-          if info and len(info) > 0:
-            done = False
-            if user_name:
-              for item in info:
-                r = re.compile(user_name,re.I)
-                if r.match(item['user']['screen_name']):
-                  msg += "@%s: %s" % (item['user']['screen_name'], item['text'])
-                  done = True
-                  break
-                # endif
-              # endfor
-              if not done: msg = "No status from %s was found." % user_name
-            # endif
+          index = int(words[1]) - 1
+          logging.debug("User send a request to get %s(%d)\n" % (words[1], index))
+          if index < 0 or index >= 100: 
+            index = 0
+            msg = "Invalid number %d. Only upto 100 allowed." % int(words[1])
+        except ValueError, e:
+          user_name = words[1].lstrip('@')
+          logging.debug("We are going to get status from %s" % user_name)
+      # Get the mentions of the user
+      try:
+        info = client.get('/statuses/home_timeline',tuser = tuser,count=100)
+        if info and len(info) > 0:
+          done = False
+          if user_name:
+            for item in info:
+              r = re.compile(user_name,re.I)
+              if r.match(item['user']['screen_name']):
+                msg += "@%s: %s" % (item['user']['screen_name'], item['text'])
+                done = True
+                break
+              # endif
+            # endfor
+            if not done: msg = "No status from %s was found." % user_name
+          # endif
 
-            if not done:
-              if (info[index]) and ('text' in info[index]):
-                msg += "@%s: %s" % (info[index]['user']['screen_name'], info[index]['text'])
-              else:
-                msg += "Could not find %d`th status in your timeline" % index
+          if not done:
+            if (info[index]) and ('text' in info[index]):
+              msg += "@%s: %s" % (info[index]['user']['screen_name'], info[index]['text'])
+            else:
+              msg += "Could not find %d`th status in your timeline" % index
 
-        except (urlfetch.DownloadError, ValueError), e:
-          logging.warning("Twup:timeline could not be fetched. %s " % e)
-          msg = "Twitter is having it's fail whale moment, so could you try again at some later time?"
-        self.response.out.write(msg[0:159])
+      except (urlfetch.DownloadError, ValueError), e:
+        logging.warning("Twup:timeline could not be fetched. %s " % e)
+        msg = "Twitter is having it's fail whale moment, so could you try again at some later time?"
+      self.response.out.write(msg[0:159])
 
-      else: # No AccessTokenID
-        logging.warning("User with no access token id tried to get their updates")
-        self.response.out.write("SMSTweet: This command works only for users signed in with OAuth. Please register at http://www.smstweet.in")
     else: # User not registered
       logging.warning("Unregistered user tried to get their updates")
       self.response.out.write("SMSTweet: This command works only for registered users. Register at http://www.smstweet.in")

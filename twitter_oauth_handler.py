@@ -165,7 +165,7 @@ class OAuthClient(object):
       return token
 
 
-    def get(self, api_method, http_method='GET', expected_status=(200,), **extra_params):
+    def get(self, api_method, http_method='GET', expected_status=(200,), tuser = None, **extra_params):
 
         if not (api_method.startswith('http://') or api_method.startswith('https://')):
             api_method = '%s%s%s' % (
@@ -173,12 +173,21 @@ class OAuthClient(object):
                 self.service_info['default_api_suffix']
                 )
 
-        if self.token is None:
-            self.token = OAuthAccessToken.get_by_key_name(self.get_cookie())
+        request_headers = {}
 
-        fetch = urlfetch(self.get_signed_url(
-            api_method, self.token, http_method, **extra_params
-            ), deadline = 10)
+        if tuser:
+          if tuser.accessTokenid:
+            self.token = self.token_for_user(tuser.user) # TODO Check return value
+            request_url = self.get_signed_url(api_method, self.token, http_method, **extra_params)
+          else:
+            request_headers['Authorization'] = 'Basic %s' % tuser.basic_auth
+            request_url = self.get_unsigned_url(api_method, http_method, **extra_params)
+        else:
+          if self.token is None:
+            self.token = OAuthAccessToken.get_by_key_name(self.get_cookie())
+          request_url = self.get_signed_url(api_method, self.token, http_method, **extra_params)
+
+        fetch = urlfetch(request_url, headers = request_headers, deadline = 10)
 
         if fetch.status_code not in expected_status:
             raise ValueError(
@@ -188,7 +197,7 @@ class OAuthClient(object):
 
         return decode_json(fetch.content)
 
-    def post(self, api_method, http_method='POST', expected_status=(200,), **extra_params):
+    def post(self, api_method, http_method='POST', expected_status=(200,), tuser = None, **extra_params):
 
         if not (api_method.startswith('http://') or api_method.startswith('https://')):
             api_method = '%s%s%s' % (
@@ -196,12 +205,21 @@ class OAuthClient(object):
                 self.service_info['default_api_suffix']
                 )
 
-        if self.token is None:
+        request_headers = {}
+        if tuser:
+          if tuser.accessTokenid:
+            self.token = self.token_for_user(tuser.user) # TODO Check return value
+            request_data = self.get_signed_body(api_method, self.token, http_method, **extra_params)
+          else:
+            request_headers['Authorization'] = 'Basic %s' % tuser.basic_auth
+            request_data = self.get_unsigned_body(api_method, http_method, **extra_params)
+        else:
+          if self.token is None:
             self.token = OAuthAccessToken.get_by_key_name(self.get_cookie())
+          request_data = self.get_signed_body(api_method, self.token, http_method, **extra_params)
 
-        fetch = urlfetch(url=api_method, payload=self.get_signed_body(
-            api_method, self.token, http_method, **extra_params
-            ), method=http_method, deadline = 10)
+
+        fetch = urlfetch(url=api_method, headers=request_headers, payload=request_data, method=http_method, deadline = 10)
 
         if fetch.status_code not in expected_status:
             raise ValueError(
@@ -304,6 +322,15 @@ class OAuthClient(object):
         return urlfetch(self.get_signed_url(
             __url, __token, __meth, **extra_params
             ), deadline = 10).content
+
+    def get_unsigned_url(self, __url,  __meth='GET',**extra_params):
+        return '%s?%s'%(__url, self.get_unsigned_body(__url, __meth, **extra_params))
+
+    def get_unsigned_body(self, __url,  __meth='GET',**extra_params):
+        kwargs = {}
+        kwargs.update(extra_params)
+
+        return urlencode(kwargs)
 
     def get_signed_url(self, __url, __token=None, __meth='GET',**extra_params):
         return '%s?%s'%(__url, self.get_signed_body(__url, __token, __meth, **extra_params))
