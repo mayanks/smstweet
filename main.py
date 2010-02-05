@@ -261,7 +261,7 @@ class UpdateTwitter(webapp.RequestHandler):
         save_tweet(info)
 
     except (urlfetch.DownloadError, ValueError), e:
-      logging.error("Update:update could not be fetched. %s " % e)
+      logging.warning("Update:update could not be fetched. %s " % e)
       msg = "Twitter is having it's fail whale moment, so could not send your message. Can you try again later?"
 
     else:
@@ -410,6 +410,7 @@ class GetUpdatesFromTwitter(webapp.RequestHandler):
 
       words = re.split("\s+",content)
       index = 0
+      to_fetch = 1
       user_name = None
       msg = ""
       if len(words) > 1 and words[1] != None:
@@ -419,12 +420,14 @@ class GetUpdatesFromTwitter(webapp.RequestHandler):
           if index < 0 or index >= 100: 
             index = 0
             msg = "Invalid number %d. Only upto 100 allowed." % int(words[1])
+          to_fetch = index + 1
         except ValueError, e:
           user_name = words[1].lstrip('@')
+          to_fetch = 100
           logging.debug("We are going to get status from %s" % user_name)
       # Get the mentions of the user
       try:
-        info = client.get('/statuses/home_timeline',tuser = tuser,count=100)
+        info = client.get('/statuses/home_timeline',tuser = tuser,count=to_fetch)
         if info and len(info) > 0:
           done = False
           if user_name:
