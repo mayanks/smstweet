@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="col_16">
+  {% if tuser %}
+  <h3>
+    {{ tuser.user }}
+  </h3>
+  {% if tweets.0 %}
+      <div class="avatar">
+        <a href="http://twitter.com/{{tweets.0.screen_name}}" title="{{tweets.0.name}}"><img src="{{tweets.0.profile_image_url}}"></a>
+      </div>
+  {% endif %}
+  <p>Number of SMSTweets : {{ tuser.tweetCount }}</p>
+  <h3>
+    Recent Tweets
+  </h3>
+  <p>
+  <ul>
+    {% for t in tweets %}
+      <li>
+        {{t.status}}
+      </li>
+    {% endfor %}
+ 
+  </ul>
+  {% else %}
+  <h3>
+    No user by that name exists
+  </h3>
+  {% endif %}
+</div>
+{% endblock %} 
+
