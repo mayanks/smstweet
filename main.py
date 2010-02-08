@@ -153,6 +153,17 @@ def authorizedAccess(func):
       func(self,*args,**kw)
   return wrapper
 
+def intWithCommas(x):
+  if type(x) not in [type(0), type(0L)]:
+    raise TypeError("Parameter must be an integer.")
+  if x < 0:
+    return '-' + intWithCommas(-x)
+  result = ''
+  while x >= 1000:
+    x, r = divmod(x, 1000)
+    result = ",%03d%s" % (r, result)
+  return "%d%s" % (x, result)
+
 
 class MainPage(webapp.RequestHandler):
   def head(self):
@@ -241,7 +252,7 @@ class MainPage(webapp.RequestHandler):
     values = {
       'user_name' : user_name,
       'message' : message,
-      'counter' : stats.counter,
+      'counter' : intWithCommas(stats.counter),
       'recentTweeters' : stats.recentTweeters,
       'flash' : flash
       }
@@ -286,19 +297,15 @@ class UpdateTwitter(webapp.RequestHandler):
       # Since no exception happened, it is safe to assume that the message was posted
 
       # Get the mentions of the user
-      if random.randint(0,1):
-        try:
-          info = client.get('/statuses/mentions', tuser = tuser,count=1)
-          msg = "could not get any message with your mention"
-          if info and len(info) > 0:
-            if 'text' in info[0]:
-              msg = "%s: %s" % (info[0]['user']['screen_name'], info[0]['text'])
-        except (urlfetch.DownloadError, ValueError), e:
-          logging.warning("Update:mentions could not be fetched. %s " % e)
-          msg = "Twitter is having it's fail whale moment, but I guess I managed to post your status."
-      else:
-        logging.warning("Informed user %s to check TWUP" % tuser.user)
-        msg = "@smstweetin: You know we have added a new feature to get status from your timeline? sms TWUP to get latest tweet. Details at http://smstweet.in/help"
+      try:
+        info = client.get('/statuses/mentions', tuser = tuser,count=1)
+        msg = "could not get any message with your mention"
+        if info and len(info) > 0:
+          if 'text' in info[0]:
+            msg = "%s: %s" % (info[0]['user']['screen_name'], info[0]['text'])
+      except (urlfetch.DownloadError, ValueError), e:
+        logging.warning("Update:mentions could not be fetched. %s " % e)
+        msg = "Twitter is having it's fail whale moment, but I guess I managed to post your status."
 
     if tuser.tweetCount == 0:
       msg = "Welcome to SMSTweet and Congrats on posting your first message. You can sms TWUP to get latest from your timeline. Details at http://smstweet.in/help"
@@ -467,7 +474,7 @@ class AboutPage(webapp.RequestHandler):
     stats = Stats.singleton()
 
     values = {
-      'counter' : stats.counter,
+      'counter' : intWithCommas(stats.counter),
       'recentTweeters' : stats.recentTweeters
       }
  
@@ -486,6 +493,10 @@ class Statistics(webapp.RequestHandler):
     tusers = TwitterUser.all().filter(
                 'tweetCount >', 0).order('-tweetCount').fetch(40)
     tweets = Tweet.all().order('-created_at').fetch(10)
+    regexp = re.compile('@(\w+)')
+    for t in tweets:
+      t.status = regexp.sub(r"<a href='http://twitter.com/\1'>@\1</a>",t.status)
+
     values = {
       'highestTweeters' : tusers,
       'tweets' : tweets
@@ -531,6 +542,30 @@ class FollowNewUser(webapp.RequestHandler):
 
   post = get
 
+class Tweeter(webapp.RequestHandler):
+  def get(self, user=''):
+    logging.warning("Tweeter called")
+    tuser = tweets = None
+    if user == '':
+      self.redirect("/stats")
+      return
+
+    tusers = TwitterUser.all().filter('user = ', user ).fetch(1)
+    if tusers and len(tusers) > 0:
+      tuser = tusers[0]
+      tweets = Tweet.all().filter('screen_name = ', tuser.user).order('-created_at').fetch(10)
+      
+      regexp = re.compile('@(\w+)')
+      for t in tweets:
+        t.status = regexp.sub(r"<a href='http://www.smstweet.in/user/\1'>@\1</a>",t.status)
+      values = {
+        'tuser' : tuser,
+        'tweets' : tweets
+        }
+      self.response.out.write(template.render('tuser.html', values))
+    else:
+      self.redirect("http://twitter.com/%s" % user)
+
 application = webapp.WSGIApplication([
   ('/', MainPage),
   ('/about', AboutPage),
@@ -541,6 +576,7 @@ application = webapp.WSGIApplication([
   ('/stats', Statistics),
   ('/test', Test),
   ('/follow_new_user', FollowNewUser),
+  ('/user/(.*)', Tweeter),
   ('/oauth/(.*)/(.*)', OAuthHandler),
 ], debug=True)
 
