@@ -231,6 +231,17 @@ li {
   padding: 0 2px;
 }
 
+ul.tweetsofuser li {
+  padding: 10px 0px 20px 0px;
+  border-bottom: 1px solid #aaa;
+  font-size: 1.3em;
+  color: #111;
+}
+
+ul.tweetsofuser li .updated {
+  color: #999;
+  font-size: 1em;
+}
 a {
   color:  #0077cc;
   text-decoration:  none;
@@ -265,6 +276,16 @@ div.avatar {
 div.avatar img {
   height: 48px;
   width: 49px;
+}
+
+div.user {
+  float:left;
+  margin: 0 8px 10px 0;
+}
+
+div.user img {
+  height: 64px;
+  width: 64px;
 }
 
 .tweeter {
