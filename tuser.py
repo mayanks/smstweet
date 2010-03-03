@@ -66,3 +66,6 @@ class TwitterUser(db.Model):
     if carrier:  self.carrier = carrier
     self.put()
 
+  def fetch_mentions_and_dms(self):
+    taskqueue.add(url = '/tasks/fetch_mentions', params = { 'phone' : self.phonenumber })
+    taskqueue.add(url = '/tasks/fetch_dms', params = { 'phone' : self.phonenumber })
