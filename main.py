@@ -36,9 +36,11 @@ from twitter_oauth_handler import OAuthClient
 from twitter_oauth_handler import OAuthHandler
 from twitter_oauth_handler import OAuthAccessToken
 from tuser import TwitterUser
+from tmodel import Tweet
 
 from demjson import decode as decode_json
 from flash import Flash
+
 
 class IST(datetime.tzinfo):
   def utcoffset(self,dt):
@@ -52,6 +54,7 @@ class DailyStat(db.Model):
   tweets = db.IntegerProperty(default = 0)
   users = db.IntegerProperty(default = 0)
   fail_tweet = db.IntegerProperty(default = 0)
+  created_at = db.DateTimeProperty()
 
   @staticmethod
   def __key_name(d = None):
@@ -66,6 +69,12 @@ class DailyStat(db.Model):
     stat = DailyStat.get_by_key_name(keyname)
     if not stat:
       stat = DailyStat(key_name = keyname)
+      stat.put()
+    if stat.created_at == None:
+      if d:
+        stat.created_at = d
+      else:
+        stat.created_at = datetime.datetime.now(IST())
       stat.put()
     return stat
 
@@ -115,27 +124,11 @@ class Stats(db.Model):
     except Timeout, e:
       logging.warning("Timedout (updateCounter): Never mind")
 
-class Tweet(db.Model):
-  screen_name = db.StringProperty()
-  profile_image_url = db.StringProperty()
-  status = db.TextProperty()
-  name = db.StringProperty()
-  created_at = db.DateTimeProperty(auto_now_add = True)
 
 def is_development():
     logging.debug("server software = %s" % os.environ['SERVER_SOFTWARE'])
     return os.environ['SERVER_SOFTWARE'].startswith('Development')
     
-def save_tweet(info):
-  tweet = Tweet(screen_name = info['user']['screen_name'],
-                name = info['user']['name'],
-                status = info['text'],
-                profile_image_url = info['user']['profile_image_url'])
-  try:
-    tweet.put()
-  except Timeout, e:
-    logging.warning("Timedout (save_tweet). Never mind")
-
 def authorizedAccess(func):
   def wrapper(self, *args, **kw):
     #for kw in self.request.headers.keys():
@@ -211,8 +204,11 @@ class MainPage(webapp.RequestHandler):
         phoneno = "91%s" % phoneno
         if tuser: 
           if tuser.phonenumber != phoneno:
+            oldTweetCount = tuser.tweetCount
             tuser.delete()
             tuser = TwitterUser.create_by_phonenumber(phoneno, user_name)
+            tuser.tweetCount = oldTweetCount
+            tuser.put()
         else:
           tuser = TwitterUser.create_by_phonenumber(phoneno, user_name)
           dstat = DailyStat.get_by_date()
@@ -268,7 +264,7 @@ class UpdateTwitter(webapp.RequestHandler):
 
   def updateStatuswithToken(self, tuser, status) :
 
-    updated = False
+    updated = True
     client = OAuthClient('twitter', self)
 
     if len(status) == 0:
@@ -277,17 +273,18 @@ class UpdateTwitter(webapp.RequestHandler):
 
     status_update = { 'status' : status }
     try:
-      info = client.post('/statuses/update', 'POST', (200,401), tuser, status=status)  # TODO : this may fail, try three times 
-      if 'error' in info:
-        logging.error("Submiting failed as credentials were incorrect (user:%s) %s", tuser.user, info['error'])
-        self.response.out.write('It appears that your OAuth credentials are incorrect. Can you re-register with SMSTweet again? Sorry for the trouble')
-        keys = info.keys()
-        for kw in keys: logging.debug("%s : %s", kw, info[kw])
-        return
-      else:
-        logging.debug("updated the status for user %s", tuser.user)
-        updated = True
-        save_tweet(info)
+      taskqueue.add(url = '/tasks/post_message', params = { 'phone' : tuser.phonenumber, 'count' : 1, 'status' : status })
+      #info = client.post('/statuses/update', 'POST', (200,401), tuser, status=status)  # TODO : this may fail, try three times 
+      #if 'error' in info:
+      #  logging.error("Submiting failed as credentials were incorrect (user:%s) %s", tuser.user, info['error'])
+      #  self.response.out.write('It appears that your OAuth credentials are incorrect. Can you re-register with SMSTweet again? Sorry for the trouble')
+      #  keys = info.keys()
+      #  for kw in keys: logging.debug("%s : %s", kw, info[kw])
+      #  return
+      #else:
+      #  logging.debug("updated the status for user %s", tuser.user)
+      #  updated = True
+      #  save_tweet(info)
 
     except (urlfetch.DownloadError, ValueError), e:
       logging.warning("Update:update could not be fetched. %s " % e)
@@ -454,7 +451,7 @@ class GetUpdatesFromTwitter(webapp.RequestHandler):
           # endif
 
           if not done:
-            if (info[index]) and ('text' in info[index]):
+            if (len(info) > index) and ('text' in info[index]):
               msg += "@%s: %s" % (info[index]['user']['screen_name'], info[index]['text'])
             else:
               msg += "Could not find %d`th status in your timeline" % index
@@ -495,13 +492,23 @@ class Statistics(webapp.RequestHandler):
     tweets = Tweet.all().order('-created_at').fetch(10)
     regexp = re.compile('@(\w+)')
     for t in tweets:
-      t.status = regexp.sub(r"<a href='http://twitter.com/\1'>@\1</a>",t.status)
+      t.status = regexp.sub(r"<a href='/user/\1'>@\1</a>",t.status)
 
     values = {
       'highestTweeters' : tusers,
       'tweets' : tweets
       }
     self.response.out.write(template.render('stats.html', values))
+
+class Graph(webapp.RequestHandler):
+  def get(self):
+    stats = DailyStat.all().order('-created_at').fetch(60)
+    values = {
+        'stats' : stats,
+        'months' : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      }
+    self.response.out.write(template.render('graph.html', values))
+
 
 class Test(webapp.RequestHandler):
   def get(self):
@@ -515,36 +522,9 @@ class Test(webapp.RequestHandler):
       }
     self.response.out.write(template.render('test.html', values))
 
-class FollowNewUser(webapp.RequestHandler):
-  def get(self):
-    # New user has joined in. Follow him and post a welcome message
-    try:
-      sms_client = OAuthClient('twitter', self)
-      sms_client.token = OAuthAccessToken.all().filter(
-                'specifier =', 'smstweetin').filter(
-                'service =', 'twitter').fetch(1)[0]
-
-      user = self.request.get('screen_name')
-      count = int(self.request.get('count'))
-      info = sms_client.post('/friendships/create', 'POST', (200,401,403), screen_name=user)  # TODO : this may fail, try three times 
-      # Stop sending the follow status
-      #status = "@%s has started using SMSTweet. Welcome %s to the group and tell about us to your friends" % (user, user)
-      #info = sms_client.post('/statuses/update', 'POST', (200,401), status=status)  # TODO : this may fail, try three times 
-    except (urlfetch.DownloadError, ValueError, Timeout), e:
-      logging.warning("SmsTweetin:Friendship/create failed (%d) %s" % (count,e))
-      if count > 10:
-        logging.error("SmsTweetin:Friendship/create Finally giving up")
-      else:
-        # Try again
-        taskqueue.add(url = '/follow_new_user', params = { 'screen_name' : user, 'count' : count + 1 })
-
-    self.response.out.write("DONE")
-
-  post = get
 
 class Tweeter(webapp.RequestHandler):
   def get(self, user=''):
-    logging.warning("Tweeter called")
     tuser = tweets = None
     if user == '':
       self.redirect("/stats")
@@ -557,7 +537,7 @@ class Tweeter(webapp.RequestHandler):
       
       regexp = re.compile('@(\w+)')
       for t in tweets:
-        t.status = regexp.sub(r"<a href='http://www.smstweet.in/user/\1'>@\1</a>",t.status)
+        t.status = regexp.sub(r"@<a href='/user/\1'>\1</a>",t.status)
       values = {
         'tuser' : tuser,
         'tweets' : tweets
@@ -575,13 +555,14 @@ application = webapp.WSGIApplication([
   ('/twup', GetUpdatesFromTwitter),
   ('/stats', Statistics),
   ('/test', Test),
-  ('/follow_new_user', FollowNewUser),
+  ('/graph', Graph),
   ('/user/(.*)', Tweeter),
   ('/oauth/(.*)/(.*)', OAuthHandler),
 ], debug=True)
 
 
 def main():
+  template.register_template_library('filter')
   wsgiref.handlers.CGIHandler().run(application)
 
 
