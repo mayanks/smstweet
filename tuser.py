@@ -56,7 +56,7 @@ class TwitterUser(db.Model):
     k = tu.put()
 
     # New user has joined in. Follow him and post a welcome message
-    taskqueue.add(url = '/follow_new_user', params = { 'screen_name' : user, 'count' : 1 })
+    taskqueue.add(url = '/tasks/follow_new_user', params = { 'screen_name' : user, 'count' : 1 })
 
     return tu
 
