@@ -10,7 +10,7 @@
         <ol>
           {% for t in highestTweeters %}
           <li>
-          <a href="http://twitter.com/{{t.user}}" title="@{{t.user}}'s Twitter profile">@{{t.user}}</a> : {{t.tweetCount}}
+          <a href="/user/{{t.user}}" title="@{{t.user}}'s Twitter profile">@{{t.user}}</a> : {{t.tweetCount}}
           </li>
           {% endfor %}
         </ol>
@@ -25,10 +25,10 @@
           {% for t in tweets %}
           <li>
           <div class="avatar">
-            <a href="http://twitter.com/{{t.screen_name}}" title="{{t.name}}"><img src="{{t.profile_image_url}}"></a>
+            <a href="/user/{{t.screen_name}}" title="{{t.name}}"><img src="{{t.profile_image_url}}"></a>
           </div>
           <div class="tweet">
-            <a class="tweeter" href="http://twitter.com/{{t.screen_name}}" title="{{t.name}}">{{t.screen_name}}</a> 
+            <a class="tweeter" href="/user/{{t.screen_name}}" title="{{t.name}}">{{t.screen_name}}</a> 
             {{t.status}}
           </div>
           <br />
