@@ -30,6 +30,9 @@ handlers:
   script: tasks.py
   login: admin
 
+- url: /sms/.*
+  script: smscommands.py
+
 - url: /remote_api
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
   login: admin
