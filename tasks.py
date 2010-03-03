@@ -68,7 +68,7 @@ class FetchDMs(webapp.RequestHandler):
       since_id = tdms[0].id
     client = OAuthClient('twitter', self)
     try:
-      info = client.get('http://api.twitter.com/1/direct_messages.json', 'GET', (200,401,403), tuser, since_id=since_id, count = 10)
+      info = client.get('http://api.twitter.com/1/direct_messages.json', 'GET', (200,401,403), tuser, since_id=since_id, count = 100)
       if 'error' in info:
         logging.warning("DM Fetch failed for %s because of %s" % (tuser.user, info['error']))
       elif len(info) > 0:
