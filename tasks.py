@@ -36,8 +36,7 @@ from twitter_oauth_handler import OAuthClient
 from twitter_oauth_handler import OAuthHandler
 from twitter_oauth_handler import OAuthAccessToken
 from tuser import TwitterUser
-from twdm import TwitterDM
-from tmodel import Tweet
+from tmodel import Tweet, TwitterDM
 
 from demjson import decode as decode_json
 
