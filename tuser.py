@@ -67,5 +67,5 @@ class TwitterUser(db.Model):
     self.put()
 
   def fetch_mentions_and_dms(self):
-    taskqueue.add(url = '/tasks/fetch_mentions', params = { 'phone' : self.phonenumber })
-    taskqueue.add(url = '/tasks/fetch_dms', params = { 'phone' : self.phonenumber })
+    taskqueue.add(url = '/tasks/fetch/mentions', params = { 'phone' : self.phonenumber })
+    taskqueue.add(url = '/tasks/fetch/dms', params = { 'phone' : self.phonenumber })
