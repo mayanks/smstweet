@@ -2,6 +2,7 @@ import logging
 import datetime
 
 from google.appengine.ext import db
+from google.appengine.ext.db import polymodel
 
 class Tweet(db.Model):
   screen_name = db.StringProperty()
@@ -22,13 +23,75 @@ class Tweet(db.Model):
     except Timeout, e:
       logging.warning("Timedout (save_tweet). Never mind")
 
-class TwitterDM(db.Model):
+class TweetStatus(polymodel.PolyModel):
   sender_screen_name = db.StringProperty()
-  recipient_screen_name = db.StringProperty()
+  user = db.StringProperty()
   status = db.TextProperty()
   created_at = db.DateTimeProperty(auto_now_add = False)
   id = db.IntegerProperty() 
   read = db.BooleanProperty(default = False)
+  
+class TweetDM(TweetStatus):
+  @classmethod
+  def getLatest(cls,user):
+    ts = TweetDM.all().filter('user = ',user).order('-id').fetch(100)
+    last_id = -1
+    deleted = False
+    for t in ts:
+      if t.id == last_id:
+        logging.debug("found a duplicate entry. deleting it")
+        db.delete(t)
+        deleted = True
+      last_id = t.id
+    if deleted: return TweetDM.getLatest(user)
+    return ts
+
+  def getLast(cls,user): 
+    ts = TweetDM.all().filter('user = ',user).order('-id').fetch(1)
+    if len(ts) > 0: return ts[0]
+    return None
+
+  @classmethod
+  def create(cls, sender_screen_name, user, status, created_at,id):
+    t = TweetDM(sender_screen_name = sender_screen_name,
+        user = user,
+        status = status,
+        created_at = datetime.datetime.strptime(created_at,'%a %b %d %H:%M:%S +0000 %Y'),
+        id = id)
+    t.put()
+    return t
+
+
+class TweetMention(TweetStatus):
+  @classmethod
+  def getLatest(cls,user):
+    ts = TweetMention.all().filter('user = ',user).order('-id').fetch(100)
+    last_id = -1
+    deleted = False
+    for t in ts:
+      if t.id == last_id:
+        logging.debug("found a duplicate entry. deleting it")
+        db.delete(t)
+        deleted = True
+      last_id = t.id
+    if deleted: return TweetMention.getLatest(user)
+    return ts
+
+  @classmethod
+  def getLast(cls,user): 
+    ts = TweetMention.all().filter('user = ',user).order('-id').fetch(1)
+    if len(ts) > 0: return ts[0]
+    return None
+
+  @classmethod
+  def create(cls, sender_screen_name, user, status, created_at,id):
+    t = TweetMention(sender_screen_name = sender_screen_name,
+        user = user,
+        status = status,
+        created_at = datetime.datetime.strptime(created_at,'%a %b %d %H:%M:%S +0000 %Y'),
+        id = id)
+    t.put()
+    return t
 
 class IST(datetime.tzinfo):
   def utcoffset(self,dt):
