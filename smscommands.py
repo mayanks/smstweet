@@ -36,7 +36,7 @@ from twitter_oauth_handler import OAuthClient
 from twitter_oauth_handler import OAuthHandler
 from twitter_oauth_handler import OAuthAccessToken
 from tuser import TwitterUser
-from tmodel import Tweet, DailyStat, Stats
+from tmodel import Tweet, DailyStat, Stats, TweetDM, TweetMention
 
 from demjson import decode as decode_json
 
@@ -97,7 +97,6 @@ class UpdateTwitter(webapp.RequestHandler):
       self.response.out.write('Dude, where is the status message to post? Pressed the send button to fast?')
       return
 
-    status_update = { 'status' : status }
     taskqueue.add(url = '/tasks/post_message', params = { 'phone' : tuser.phonenumber, 'count' : 1, 'status' : status })
 
     # Get the mentions of the user
@@ -262,10 +261,49 @@ class GetUpdatesFromTwitter(webapp.RequestHandler):
     self.response.out.write(msg[0:159])
 
 
-class MyMentions(webapp.RequestHandler):
+class GetStatuses(webapp.RequestHandler):
+
   @authorizedSignedAccess
-  def get(self):
-    self.response.out.write("SMSTweet: ")
+  def get(self, type):
+    logging.debug("Received request to get %s for user %s " % (type, self.tuser.user))
+    words = re.split("\s+",self.content)
+    index = -1
+    msg = ""
+    if len(words) > 1 and words[1] != None:
+      try:
+        index = int(words[1]) - 1
+        logging.debug("User send a request to get %s(%d)\n" % (words[1], index))
+        if index < 0 or index >= 100: 
+          msg = "Invalid number %d. Only upto 100 allowed." % int(words[1])
+      except ValueError, e:
+        logging.debug("We are going to get status from %s" % user_name)
+        msg = "Invalid option %s. Only numbers allowed." % words[1]
+
+    if type == 'mention':
+      statuses = TweetMention.getLatest(self.tuser.user)
+    elif type == 'dm':
+      statuses = TweetDM.getLatest(self.tuser.user)
+    else:
+      self.response.out.write("Unknown option %s" % type)
+    total = len(statuses)
+    if index == -1:
+      for i in range(0,total):
+        if statuses[i].read == False:
+          index = i
+          break
+      if index == -1: index = 0
+    if index >= total:
+      msg += "Sorry, you do not have %d messages yet. Try again" % (index+1)
+    else:
+      t = statuses[index]
+      msg += "(%d of %d)@%s: %s" % (index+1,total,t.sender_screen_name,t.status)
+      t.read = True
+      try:
+        t.put()
+      except: pass
+
+    self.tuser.fetch_mentions_and_dms()
+    self.response.out.write(msg)
  
 class MyDMs(webapp.RequestHandler):
   @authorizedSignedAccess
@@ -275,8 +313,7 @@ class MyDMs(webapp.RequestHandler):
 application = webapp.WSGIApplication([
   ('/sms/update', UpdateTwitter),
   ('/sms/twup', GetUpdatesFromTwitter),
-  ('/sms/twme', MyMentions),
-  ('/sms/twdm', MyDMs)
+  ('/sms/get/(.*)', GetStatuses)
 ], debug=True)
 
 
