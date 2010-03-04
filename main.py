@@ -242,8 +242,6 @@ application = webapp.WSGIApplication([
   ('/about', AboutPage),
   ('/help', HelpPage),
   ('/news', LatestPage),
-  ('/update', UpdateTwitter),
-  ('/twup', GetUpdatesFromTwitter),
   ('/stats', Statistics),
   ('/test', Test),
   ('/graph', Graph),
