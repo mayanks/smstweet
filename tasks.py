@@ -31,60 +31,54 @@ from google.appengine.api import urlfetch
 from google.appengine.ext.webapp import template
 from google.appengine.api.datastore_errors import Timeout
 from google.appengine.api.labs import taskqueue
+from google.appengine.api import memcache
 
 from twitter_oauth_handler import OAuthClient
 from twitter_oauth_handler import OAuthHandler
 from twitter_oauth_handler import OAuthAccessToken
 from tuser import TwitterUser
-from tmodel import Tweet, TwitterDM
+from tmodel import Tweet, TweetDM, TweetMention
 
 from demjson import decode as decode_json
 
 
-class FetchMentions(webapp.RequestHandler):
-  def post(self):
-    logging.debug("calling the dm function")
-    phone = self.request.get('phone')    
-    tuser = TwitterUser.get_by_phonenumber(phone)
-    if tuser == None:
-      logging.warning("Could not fetch tuser based on phone number %s",phone)
-      return
-    self.response.out.write("DONE")
-
-
-class FetchDMs(webapp.RequestHandler):
-  def post(self):
-    logging.debug("calling the dm function")
+class FetchStatuses(webapp.RequestHandler):
+  def fetch_status(self,type,key_name, url):
     phone = self.request.get('phone')    
     tuser = TwitterUser.get_by_phonenumber(phone)
     if tuser == None:
       logging.warning("Could not fetch tuser based on phone number %s",phone)
       return
 
-    # Get the last dm of this person
-    tdms = TwitterDM.all().filter('recipient_screen_name = ', tuser.user).order('-id').fetch(1)
-    since_id = -1
-    if len(tdms) > 0:
-      since_id = tdms[0].id
+    since_id = memcache.get("%s%s" % (key_name,tuser.user))
+    if not since_id:
+      since_id = -1
+      memcache.add("%s%s" % (key_name,tuser.user), since_id)
+
     client = OAuthClient('twitter', self)
     try:
-      info = client.get('http://api.twitter.com/1/direct_messages.json', 'GET', (200,401,403), tuser, since_id=since_id, count = 100)
+      info = client.get(url, 'GET', (200,401,403), tuser, since_id=since_id, count = 100)
       if 'error' in info:
-        logging.warning("DM Fetch failed for %s because of %s" % (tuser.user, info['error']))
+        logging.warning("%s Fetch failed for %s because of %s" % (type,tuser.user, info['error']))
       elif len(info) > 0:
-        logging.debug("fetched %d dm's for %s" % (len(info), tuser.user))
-        for dm in info:
-          tdm = TwitterDM(sender_screen_name = dm['sender_screen_name'],
-              recipient_screen_name = dm['recipient_screen_name'],
-              status = dm['text'],
-              created_at = datetime.datetime.strptime(dm['created_at'],'%a %b %d %H:%M:%S +0000 %Y'),
-              id = dm['id'])
-          tdm.put()
-        #endfor
+        logging.debug("fetched %d %s's for %s" % (len(info), type,tuser.user))
+        memcache.replace("%s%s" % (key_name,tuser.user), info[0]['id'])
+        if type == 'DM':
+          for dm in info: TweetDM.create(dm['sender_screen_name'],tuser.user, dm['text'], dm['created_at'], dm['id'])
+        else:
+          for dm in info: TweetMention.create(dm['user']['screen_name'],tuser.user, dm['text'], dm['created_at'], dm['id'])
+        #endif
       #endif
     except (urlfetch.DownloadError, ValueError), e:
-      logging.warning("DirectMessages: could not be fetched. %s " % e)
+      logging.warning("%s: could not be fetched. %s " % (type,e))
  
+  def post(self,type):
+    if type == 'dms':
+      self.fetch_status('DM','dm_','/direct_messages')
+    elif type == 'mentions':
+      self.fetch_status('Mentions','mention_','/statuses/mentions')
+    else:
+      logging.error("Could not understand how to fetch %s" % type)
     self.response.out.write("DONE")
   #endpost
 
@@ -151,8 +145,7 @@ class FollowNewUser(webapp.RequestHandler):
 
 
 application = webapp.WSGIApplication([
-  ('/tasks/fetch_mentions', FetchMentions),
-  ('/tasks/fetch_dms', FetchDMs),
+  ('/tasks/fetch/(.*)', FetchStatuses),
   ('/tasks/follow_new_user', FollowNewUser),
   ('/tasks/post_message', PostMessage)
 ], debug=True)
