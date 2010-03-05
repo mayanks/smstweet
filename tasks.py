@@ -32,6 +32,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.api.datastore_errors import Timeout
 from google.appengine.api.labs import taskqueue
 from google.appengine.api import memcache
+from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 
 from twitter_oauth_handler import OAuthClient
 from twitter_oauth_handler import OAuthHandler
