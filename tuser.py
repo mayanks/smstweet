@@ -30,6 +30,7 @@ class TwitterUser(db.Model):
   accessTokenid = db.StringProperty()
   location = db.StringProperty(default = "")
   carrier = db.StringProperty(default = "")
+  reminder = db.IntegerProperty(default = 0)
 
   @staticmethod
   def __key_name(phnum):
