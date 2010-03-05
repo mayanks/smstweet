@@ -90,7 +90,6 @@ class UpdateTwitter(webapp.RequestHandler):
 
   def updateStatuswithToken(self, tuser, status) :
 
-    updated = True
     client = OAuthClient('twitter', self)
 
     if len(status) == 0:
@@ -99,21 +98,26 @@ class UpdateTwitter(webapp.RequestHandler):
 
     taskqueue.add(url = '/tasks/post_message', params = { 'phone' : tuser.phonenumber, 'count' : 1, 'status' : status })
 
-    # Get the mentions of the user
-    try:
-      info = client.get('/statuses/mentions', tuser = tuser,count=1)
-      msg = "could not get any message with your mention"
-      if info and len(info) > 0:
-        if 'text' in info[0]:
-          msg = "%s: %s" % (info[0]['user']['screen_name'], info[0]['text'])
-    except (urlfetch.DownloadError, ValueError), e:
-      logging.warning("Update:mentions could not be fetched. %s " % e)
-      msg = "Twitter is having it's fail whale moment, but I guess I managed to post your status."
-
     if tuser.tweetCount == 0:
       msg = "Welcome to SMSTweet and Congrats on posting your first message. You can sms TWUP to get latest from your timeline. Details at http://smstweet.in/help"
+    elif tuser.reminder and tuser.reminder == 1:
+      # Get the mentions of the user
+      try:
+        info = client.get('/statuses/mentions', tuser = tuser,count=1)
+        msg = "could not get any message with your mention"
+        if info and len(info) > 0:
+          if 'text' in info[0]:
+            msg = "%s: %s" % (info[0]['user']['screen_name'], info[0]['text'])
+      except (urlfetch.DownloadError, ValueError), e:
+        logging.warning("Update:mentions could not be fetched. %s " % e)
+        msg = "Twitter is having it's fail whale moment, but I guess I managed to post your status."
+    else:
+      tuser.reminder = 1
+      tuser.put
+      msg = "Now you can check your mentions and DM's by sending sms TWME or TWDM, follow @smstweetin for details"
+
     self.response.out.write(msg)
-    return updated
+    return
 
   def registerUser(self, phoneno, user_name, passwd):
     basic_auth = base64.encodestring('%s:%s' % (user_name, passwd))[:-1]
@@ -171,18 +175,13 @@ class UpdateTwitter(webapp.RequestHandler):
 
       updated = False
       status = self.content[0:139]  # makes sure status is 140 chars long
-      updated = self.updateStatuswithToken(tuser, status)
+      self.updateStatuswithToken(tuser, status)
 
       try:
-        if updated:
-          dstat = DailyStat.get_by_date()
-          dstat.new_tweet()
+        dstat = DailyStat.get_by_date()
+        dstat.new_tweet()
 
-          tuser.incr_counter(location,carrier)
-
-        else:
-          dstat = DailyStat.get_by_date()
-          dstat.failed_tweet()
+        tuser.incr_counter(location,carrier)
 
         tuser.fetch_mentions_and_dms()
         Stats.updateCounter(tuser.user)
