@@ -391,6 +391,64 @@ class OAuthClient(object):
             ('oauth.%s' % self.service, path)
             )
 
+    def get_xauth_token(self,username,password):
+      _meth = 'POST' 
+      api_method = 'https://api.twitter.com/oauth/access_token'
+      service_info = self.service_info
+      
+      kwargs = {
+        'oauth_consumer_key': service_info['consumer_key'],
+        'oauth_nonce': getrandbits(64),
+        'oauth_signature_method': 'HMAC-SHA1',
+        'oauth_timestamp': int(time()),
+        'oauth_version': '1.0'}
+      params = {
+        'x_auth_mode': 'client_auth',
+        'x_auth_password': password,
+        'x_auth_username': username
+        }
+
+      oauth_params = kwargs.copy()
+      kwargs.update(params)
+
+      message_array = [ _meth, api_method, '&'.join('%s=%s' % (encode(k), encode(kwargs[k])) for k in sorted(kwargs)) ]
+      key = get_service_key(self.service)
+      message = '&'.join(map(encode, message_array))
+
+      oauth_params['oauth_signature'] = hmac(
+          key, message, sha1
+          ).digest().encode('base64')[:-1]
+
+      oauth_header = "OAuth %s" % ', '.join("%s=\"%s\"" % (encode(k), encode(oauth_params[k])) for k in sorted(oauth_params))
+
+      request_headers = {}
+      request_headers['Authorization'] = oauth_header
+      request_data = urlencode(params)
+
+      fetch = urlfetch(url=api_method, headers=request_headers, payload=request_data, method='POST', deadline = 10)
+
+      self.token = None
+      if fetch.status_code == 200:
+        key_name = create_uuid()
+
+        self.token = OAuthAccessToken(
+            key_name=key_name, service=self.service,
+            **dict(t.split('=') for t in fetch.content.split('&'))
+            )
+
+        # TODO : Handle the GET timeout error in the following line
+        if 'specifier_handler' in self.service_info:
+          specifier = self.token.specifier = self.service_info['specifier_handler'](self)
+          old = OAuthAccessToken.all().filter(
+                'specifier =', specifier).filter(
+                'service =', self.service)
+          db.delete(old)
+
+          self.token.put()
+
+      return self.token
+
+
 # ------------------------------------------------------------------------------
 # oauth handler
 # ------------------------------------------------------------------------------

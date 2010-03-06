@@ -120,6 +120,22 @@ class UpdateTwitter(webapp.RequestHandler):
     return
 
   def registerUser(self, phoneno, user_name, passwd):
+    client = OAuthClient('twitter', self)
+    token = client.get_xauth_token(user_name, passwd)
+    if token:
+      tuser = TwitterUser.create_by_phonenumber(phoneno, token.specifier)
+      tuser.accessTokenid = '-1'
+      tuser.put()
+      dstat = DailyStat.get_by_date()
+      dstat.new_user()
+
+      self.response.out.write("Congratulations !! Your twitter username is registered. Go ahead and send a twitter message by SMSing \"twt <your twitter status\"")
+    else:
+      logging.error("Failed to get token for user %s with passwd %s\n" % (user_name, passwd )) 
+      self.response.out.write("Incorrect username/password. Note that both username and password are case sensitive. Better register online at http://www.smstweet.in") 
+
+
+  def registerUserOld(self, phoneno, user_name, passwd):
     basic_auth = base64.encodestring('%s:%s' % (user_name, passwd))[:-1]
     request_headers = {}
     request_headers['Authorization'] = 'Basic %s' % basic_auth
@@ -268,14 +284,13 @@ class GetStatuses(webapp.RequestHandler):
     words = re.split("\s+",self.content)
     index = -1
     msg = ""
-    if len(words) > 1 and words[1] != None:
+    if len(words) > 1 and words[1] != None and words[1] != "":
       try:
         index = int(words[1]) - 1
         logging.debug("User send a request to get %s(%d)\n" % (words[1], index))
         if index < 0 or index >= 100: 
           msg = "Invalid number %d. Only upto 100 allowed." % int(words[1])
       except ValueError, e:
-        logging.debug("We are going to get status from %s" % user_name)
         msg = "Invalid option %s. Only numbers allowed." % words[1]
 
     if type == 'mention':
