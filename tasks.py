@@ -58,7 +58,7 @@ class FetchStatuses(webapp.RequestHandler):
 
     client = OAuthClient('twitter', self)
     try:
-      info = client.get(url, 'GET', (200,401,403), tuser, since_id=since_id, count = 100)
+      info = client.get(url, 'GET', (200,401,403), tuser, since_id=since_id, count = 10)
       if 'error' in info:
         logging.warning("%s Fetch failed for %s because of %s" % (type,tuser.user, info['error']))
       elif len(info) > 0:
@@ -72,6 +72,13 @@ class FetchStatuses(webapp.RequestHandler):
       #endif
     except (urlfetch.DownloadError, ValueError), e:
       logging.warning("%s: could not be fetched. %s " % (type,e))
+
+    if type == 'DM':
+      oldentries = TweetDM.all().filter('user = ', tuser.user).order('-id').fetch(100,100)
+    else:
+      oldentries = TweetMention.all().filter('user = ', tuser.user).order('-id').fetch(100,100)
+    logging.debug("Found %d old stuff, deleting them" % len(oldentries))
+    db.delete(oldentries)
  
   def post(self,type):
     if type == 'dms':
@@ -94,7 +101,6 @@ class PostMessage(webapp.RequestHandler):
       logging.warning("Could not fetch tuser based on phone number %s",phone)
       return
 
-    status_update = { 'status' : status }
     client = OAuthClient('twitter', self)
     try:
       info = client.post('/statuses/update', 'POST', (200,401,403), tuser, status=status)
