@@ -101,7 +101,7 @@ def create_uuid():
     return 'id-%s' % uuid4()
 
 def encode(text):
-    return urlquote(str(text), '')
+    return urlquote(str(text), safe='~')
 
 def twitter_specifier_handler(client):
     return client.get('/account/verify_credentials')['screen_name']
@@ -150,11 +150,16 @@ class OAuthClient(object):
 
     def token_for_user(self, user_name):
       count = 0
+      token = None
       while count < 3:
         try:
-          token = OAuthAccessToken.all().filter(
+          tokens = OAuthAccessToken.all().filter(
                   'specifier =', user_name).filter(
-                  'service =', 'twitter').fetch(1)[0]
+                  'service =', 'twitter').fetch(1)
+          if len(tokens) > 0:
+            token = tokens[0]
+          else:
+            logging.warning("Could not find token for user %s" % user_name)
           break
         except Timeout, e:
           logging.warning("Timedout(updateStatuswithToken): Trying again")
@@ -178,6 +183,8 @@ class OAuthClient(object):
         if tuser:
           if tuser.accessTokenid:
             self.token = self.token_for_user(tuser.user) # TODO Check return value
+            if self.token == None:
+              raise ValueError("Could not get token for %s with phone %s" % (tuser.user,tuser.phonenumber))
             request_url = self.get_signed_url(api_method, self.token, http_method, **extra_params)
           else:
             request_headers['Authorization'] = 'Basic %s' % tuser.basic_auth
@@ -209,6 +216,8 @@ class OAuthClient(object):
         if tuser:
           if tuser.accessTokenid:
             self.token = self.token_for_user(tuser.user) # TODO Check return value
+            if self.token == None:
+              raise ValueError("Could not get token for %s with phone %s" % (tuser.user,tuser.phonenumber))
             request_data = self.get_signed_body(api_method, self.token, http_method, **extra_params)
           else:
             request_headers['Authorization'] = 'Basic %s' % tuser.basic_auth
