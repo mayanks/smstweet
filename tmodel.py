@@ -35,15 +35,15 @@ class TweetDM(TweetStatus):
   @classmethod
   def getLatest(cls,user):
     ts = TweetDM.all().filter('user = ',user).order('-id').fetch(100)
-    last_id = -1
-    deleted = False
-    for t in ts:
-      if t.id == last_id:
-        logging.debug("found a duplicate entry. deleting it")
-        db.delete(t)
-        deleted = True
-      last_id = t.id
-    if deleted: return TweetDM.getLatest(user)
+    #last_id = -1
+    #deleted = False
+    #for t in ts:
+    #  if t.id == last_id:
+    #    logging.debug("found a duplicate entry. deleting it")
+    #    db.delete(t)
+    #    deleted = True
+    #  last_id = t.id
+    #if deleted: return TweetDM.getLatest(user)
     return ts
 
   def getLast(cls,user): 
@@ -66,15 +66,15 @@ class TweetMention(TweetStatus):
   @classmethod
   def getLatest(cls,user):
     ts = TweetMention.all().filter('user = ',user).order('-id').fetch(100)
-    last_id = -1
-    deleted = False
-    for t in ts:
-      if t.id == last_id:
-        logging.debug("found a duplicate entry. deleting it")
-        db.delete(t)
-        deleted = True
-      last_id = t.id
-    if deleted: return TweetMention.getLatest(user)
+    #last_id = -1
+    #deleted = False
+    #for t in ts:
+    #  if t.id == last_id:
+    #    logging.debug("found a duplicate entry. deleting it")
+    #    db.delete(t)
+    #    deleted = True
+    #  last_id = t.id
+    #if deleted: return TweetMention.getLatest(user)
     return ts
 
   @classmethod
