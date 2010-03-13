@@ -96,7 +96,7 @@ class UpdateTwitter(webapp.RequestHandler):
       self.response.out.write('Dude, where is the status message to post? Pressed the send button to fast?')
       return
 
-    taskqueue.add(url = '/tasks/post_message', params = { 'phone' : tuser.phonenumber, 'count' : 1, 'status' : status })
+    taskqueue.add(url = '/tasks/post_message', params = { 'phone' : tuser.phonenumber, 'count' : 1, 'status' : status[:140] })
 
     if tuser.tweetCount == 0:
       msg = "Welcome to SMSTweet and Congrats on posting your first message. You can sms TWUP to get latest from your timeline. Details at http://smstweet.in/help"
