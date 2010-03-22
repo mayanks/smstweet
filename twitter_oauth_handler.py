@@ -43,6 +43,7 @@ from google.appengine.api.urlfetch import fetch as urlfetch, GET, POST, Download
 from google.appengine.ext import db
 from google.appengine.ext.webapp import RequestHandler, WSGIApplication
 from google.appengine.api.datastore_errors import Timeout
+from google.appengine.api import memcache
 
 # ------------------------------------------------------------------------------
 # configuration -- SET THESE TO SUIT YOUR APP!!
@@ -150,7 +151,10 @@ class OAuthClient(object):
 
     def token_for_user(self, user_name):
       count = 0
-      token = None
+      token = memcache.get("token_%s" % user_name)
+      if token:
+        return token
+
       while count < 3:
         try:
           tokens = OAuthAccessToken.all().filter(
@@ -167,6 +171,8 @@ class OAuthClient(object):
 
       if token == None:
         logging.error("Could not fetch client token in 3 attempts. Giving up")
+      else:
+        memcache.add("token_%s" % user_name, token)
       return token
 
 
