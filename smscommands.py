@@ -96,9 +96,14 @@ class UpdateTwitter(webapp.RequestHandler):
       self.response.out.write('Dude, where is the status message to post? Pressed the send button to fast?')
       return
 
+    if len(status) < 121:
+      status = "%s #smstweet" % status
     taskqueue.add(url = '/tasks/post_message', params = { 'phone' : tuser.phonenumber, 'count' : 1, 'status' : status[:140] })
 
-    if tuser.tweetCount == 0:
+    lastError = tuser.get_last_error()
+    if lastError:
+      msg = lastError
+    elif tuser.tweetCount == 0:
       msg = "Welcome to SMSTweet and Congrats on posting your first message. You can sms TWUP to get latest from your timeline. Details at http://smstweet.in/help"
     elif tuser.reminder and tuser.reminder == 1:
       # Get the mentions of the user
@@ -131,7 +136,7 @@ class UpdateTwitter(webapp.RequestHandler):
 
       self.response.out.write("Congratulations !! Your twitter username is registered. Go ahead and send a twitter message by SMSing \"twt <your twitter status\"")
     else:
-      logging.error("Failed to get token for user %s with passwd %s\n" % (user_name, passwd )) 
+      logging.warning("Failed to get token for user %s with passwd %s\n" % (user_name, passwd )) 
       self.response.out.write("Incorrect username/password. Note that both username and password are case sensitive. Better register online at http://www.smstweet.in") 
 
 
