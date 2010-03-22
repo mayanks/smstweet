@@ -31,6 +31,7 @@ class TwitterUser(db.Model):
   location = db.StringProperty(default = "")
   carrier = db.StringProperty(default = "")
   reminder = db.IntegerProperty(default = 0)
+  lastError = db.StringProperty()
 
   @staticmethod
   def __key_name(phnum):
@@ -60,6 +61,14 @@ class TwitterUser(db.Model):
     taskqueue.add(url = '/tasks/follow_new_user', params = { 'screen_name' : user, 'count' : 1 })
 
     return tu
+
+  def get_last_error(self):
+    ret = None
+    if self.lastError:
+      ret = self.lastError
+      self.lastError = None
+      self.put()
+    return ret
 
   def incr_counter(self, location = None, carrier = None):
     self.tweetCount += 1
