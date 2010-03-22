@@ -3,6 +3,7 @@ import datetime
 
 from google.appengine.ext import db
 from google.appengine.ext.db import polymodel
+from google.appengine.api.datastore_errors import Timeout
 
 class Tweet(db.Model):
   screen_name = db.StringProperty()
