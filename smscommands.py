@@ -96,8 +96,6 @@ class UpdateTwitter(webapp.RequestHandler):
       self.response.out.write('Dude, where is the status message to post? Pressed the send button to fast?')
       return
 
-    if len(status) < 121:
-      status = "%s #smstweet" % status
     taskqueue.add(url = '/tasks/post_message', params = { 'phone' : tuser.phonenumber, 'count' : 1, 'status' : status[:140] })
 
     lastError = tuser.get_last_error()
