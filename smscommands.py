@@ -30,6 +30,7 @@ from google.appengine.ext import webapp
 from google.appengine.api import urlfetch
 from google.appengine.ext.webapp import template
 from google.appengine.api.datastore_errors import Timeout
+from google.appengine.runtime import DeadlineExceededError
 from google.appengine.api.labs import taskqueue
 
 from twitter_oauth_handler import OAuthClient
@@ -207,6 +208,8 @@ class UpdateTwitter(webapp.RequestHandler):
         
       except Timeout, e:
         logging.warning("Timed out logging the stats !! never mind")
+      except DeadlineExceededError, e:
+        logging.error("Deadline exceeded while logging the stats !! never mind")
 
     else:
       m = re.match("^\s*(\S+)\s+(\S+)\s+(\S+)", self.content)

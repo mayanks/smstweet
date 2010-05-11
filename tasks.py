@@ -105,7 +105,7 @@ class PostMessage(webapp.RequestHandler):
     try:
       info = client.post('/statuses/update', 'POST', (200,401,403), tuser, status=status)
       if 'error' in info:
-        logging.error("Submiting failed as credentials were incorrect (user:%s) %s", tuser.user, info['error'])
+        logging.warning("Submiting failed as credentials were incorrect (user:%s) %s", tuser.user, info['error'])
         tuser.lastError = "Twitter returned '%s' for your last update. You may be over limit or may have to register with SMSTweet again" % info['error']
         tuser.put()
       else:

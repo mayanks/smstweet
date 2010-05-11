@@ -316,8 +316,9 @@ class OAuthClient(object):
             specifier = self.token.specifier = self.service_info['specifier_handler'](self)
             old = OAuthAccessToken.all().filter(
                 'specifier =', specifier).filter(
-                'service =', self.service)
-            db.delete(old)
+                'service =', self.service).fetch(10)
+            if old and len(old) > 0:
+                db.delete(old)
 
         self.token.put()
         self.set_cookie(key_name)
@@ -456,8 +457,9 @@ class OAuthClient(object):
           specifier = self.token.specifier = self.service_info['specifier_handler'](self)
           old = OAuthAccessToken.all().filter(
                 'specifier =', specifier).filter(
-                'service =', self.service)
-          db.delete(old)
+                'service =', self.service).fetch(10)
+          if old and len(old)>0:
+            db.delete(old)
 
           self.token.put()
 
