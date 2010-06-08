@@ -1,306 +1,325 @@
 /*
-  SMStweet
-  URL:
-  Author: Rohit Arondekar
-  Author URL: http://rohitarondekar.com
-*/
-
-/*
   Reset
 */
-
 * {
   padding: 0;
   margin: 0;
 }
 
-/* 
-  Layout-Grid
+/*
+* display block for HTML5 elements. Only required for old browsers.
+*/
+article, aside, footer, header, nav, section {  display: block; }
+
+/*
+  Layout
 */
 
-#container {
-  width:  960px;
-  margin: 0 auto;
+body {
+/*
+  background: url('../images/bg.gif');
+*/
 }
 
-.col_1, .col_2, .col_3, .col_4, .col_5, .col_6, .col_7, .col_8, .col_9, .col_10, .col_11, .col_12, .col_13, .col_14, .col_15, .col_16 {
+.col {
   float: left;
-  margin: 0 10px;
-}
-
-/* width = 60 * nos_of_cols - 20*/
-
-.col_1 {
-  width: 40px;
-}
-
-.col_2 {
-  width: 120px;
-}
-
-.col_3 {
-  width: 160px;
-}
-
-.col_4 {
-  width: 220px;
-}
-
-.col_5 {
-  width: 280px;
-}
-
-.col_6 {
-  width: 340px;
-}
-
-.col_8 {
-  width: 460px;
-}
-
-.col_16 {
-  width: 940px;
-}
-
-br {
-  clear: both;
-}
-
-div.row {
-  clear: left;
+  margin-right: 10px;
+  padding-right: 10px;
 }
 
 /*
-  Layout-Layout
+  Column widths
+  width = 60 * nos of cols - 20
 */
+.one { width: 40px; }
+.two { width: 100px; }
+.three { width: 160px; }
+.four { width: 220px; }
+.five { width: 280px; }
+.six { width: 340px; }
+.seven { width: 400px; }
+.eight { width: 460px; }
+.nine { width: 520px; }
+.ten { width: 580px; }
+.eleven { width: 640px; }
+.twelve { width: 700px; }
+.thirteen { width: 760px; }
+.fourteen { width: 820px; }
+.fifteen { width: 880px; }
+.sixteen { width: 940px; }
 
-a img {
-  border: 0;
+br { clear: both; }
+
+.container {
+  width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-#slogan {
-  margin: 18px 10px;
-}
-div#header {
-  margin-top: 5px;
+#logo, header { background-color: #333; }
+#banner-container, #banner { background-color: #efefef; }
+
+#banner-container {
+  padding: 18px 0 16px 0;
+  border-bottom: 2px solid #eee;
 }
 
-div#content {
- background-color: #ececd0;
- padding: 10px 40px;
- margin: 0 10px;
+#content-container {
+  padding: 16px 0 18px 0;
+  border-top: 2px solid #efefef; 
 }
 
-div#nav ul, div#nav li {
-  font-size:  1.3em;
-  width: 100%;
-  font-family:  verdana, "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
-  font-weight:  bold; 
-  list-style:  none;
-  float:  left;
-  padding: 0;
+/*
+  Navigation
+*/
+nav ul, nav li {
+  float: left;
+  list-style: none;
+  margin-top: 18px;
+  padding-left: 0;
 }
 
-div#nav ul li {
-  line-height: 15px;  
-  text-align:  left;
-  width: 12%;
-  margin: 15px 0;
-  padding-top: 52px;
-  padding-left: 50px;
+nav ul li a:link, nav ul li a:visited {
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  width: 115px;
+  padding: 5px 20px;
+  margin: 0px 10px;
 }
 
-div#nav ul {
-  margin-bottom: 0;
+nav ul li a:hover, nav ul li a.current {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  background-color: #fff;
+  color: #00ccff;
 }
 
-div#nav a {
-  color:  #999;
-  text-decoration: none;
-}
+ul { padding-left: 18px; }
 
-div#nav a:active {
-  color: #555;
-  text-decoration: none;
-}
-
-div#nav a:hover {
-  color: #0077cc;
-  text-decoration: none;
-}
-
+a img { border: 0; }
 
 /*
   Typography
 */
 
 body {
-  font-size:  62.5%;
-  font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
-  line-height:  15px;
+  font-size: 62.5%;
+  font-family:  Verdana, Geneva, sans-serif;
+  line-height: 18px;
 }
 
-html>body {
-  font-size:  10px;
+html>body { font-size: 10px; } /* IE hack */
+
+h1 { font-size: 44px; }
+h2 { font-size: 2.4em; }
+h3 { font-size: 1.9em; }
+h4 { font-size: 1.5em; }
+h5 { font-size: 1.3em; }
+h6 { font-size: 1.2em; }
+p, ul li { font-size: 1.2em; }
+
+
+h2, h3, h4, h5, h6 { font-family: Arial, Helvetica, sans-serif; }
+
+h1 {
+  color: #111; 
+  margin: 18px 0 18px 0;
+  line-height: 64px;
 }
 
-h1#logo {
-  margin-bottom: 10px;
+
+h2 {
+  color: #787878;
+  margin: 18px 0 18px 0;
+  line-height: 28px;
 }
 
 h3 {
-  color: #333;
-  font-size: 1.8em;
-  font-weight: bold;
-  margin: 15px 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #ccc;
+  color: #444;
+  margin: 18px 0 18px 0;
+  line-height: 24px;
 }
 
-h4 {
-  color: #333;
-  font-size: 1.4em;
-  font-weight: bold;
-  margin: 15px 0;
-  padding: 0 2px;
+h4 { color: #555; margin: 18px 0 -18px 0; }
+
+h5, h6 { 
+  color: #555;
+  margin: 18px 0 18px 0;
 }
 
 p {
-  color: #444;
-  font-size: 1.1em;
-  margin: 15px 0;
-  font-family: verdana, sans-serif;
-  text-align: justify;
-  padding: 0 2px;
+  color: #666;
+  margin: 18px 0 18px 0;
+  font-family: verdana, arial, sans-serif;
 }
 
-p.count {
-  font-family: "Courier New", monospace;
-  font-size: 1.8em;
-  line-height: 15px;
-  background: #000;
-  color: #fff;
-  margin: 15px 0 17px 0;
-  padding: 5px 5px 8px 5px;
-  text-align: center;
-  font-weight: bold;
+ul li {
+  font-family: verdana, arial, sans-serif;
+  color: #666;
 }
 
-label {
-  color: #444;
-  font-size: 1.1em;
-  margin: 15px 0;
-  font-family: verdana, sans-serif;
-  text-align: justify;
-  padding: 0 2px;
-}
-
-input {
-  color: #444;
-  font-size: 1.2em;
-  margin: 4px 2px;
-  font-family: verdana, sans-serif;
-  text-align: justify;
-  padding: 1px 1px 2px 1px;
-}
-
-input[type="submit"] {
-  font-size: 1.1em;
-}
-
-.nos {
- color: #0000ff;
-}
-
-.date {
-  color: #999;
-  text-align: justify;
-  padding: 0 2px;  
-}
-
-ul {
-  list-style: none;
-  margin: 15px 0;
-}
-
-li {
-  color: #444;
-  font-size: 1.1em;
-  font-family: verdana, sans-serif;
-  text-align: justify;
-  padding: 0 2px;
-}
-
-ul.tweetsofuser li {
-  padding: 10px 0px 20px 0px;
-  border-bottom: 1px solid #aaa;
-  font-size: 1.3em;
-  color: #111;
-}
-
-ul.tweetsofuser li .updated {
-  color: #999;
-  font-size: 1em;
-}
 a {
-  color:  #0077cc;
-  text-decoration:  none;
+  color: #00ccff;
+  text-decoration: none;
 }
 
 a:hover {
-  color:  #222;
-  text-decoration:  none;
+  color: #6a6a6a;
+  background-color: #f0f0f0;
 }
 
-#footer p {
-  font-size: 1em;
-  color:  #BBB;
-  text-align:  center;
+/*
+  Typography-IDS
+*/
+#banner h3 { font-family: "Times New Roman", serif; }
+
+/*
+  Typography-Classes
+*/
+.note {
+  color: #666;
+  font-style: italic;
 }
 
-#footer a {
-  color:  #999;
-  text-decoration:  none;
+.lead {
+  color: #999;
+  font-weight: normal;
+  font-family: "Times New Roman", serif;
+  font-style: italic;
+  line-height: 24px;
 }
 
-#footer a:hover {
-  color:  #222;
-  text-decoration:  none;
+.date {
+  color: #bbb;
+  font-weight: normal;
+  font-variant: small-caps;
 }
 
-div.avatar {
-  float:left;
-  margin: 0 8px 10px 0;
+
+/* everything is constructed with a single background image */
+
+/* root element for tabs */
+#flowtabs {
+	
+	/* dimensions */
+	width:580px;
+	height:31px !important;
+	margin:0 !important; 
+	padding:0;	
+	
+	/* IE6 specific branch (prefixed with "_") */
+	_margin-bottom:-2px;
 }
 
-div.avatar img {
-  height: 48px;
-  width: 49px;
+/* single tab */
+#flowtabs li { 
+	float:left; 
+	margin:0; 
+	padding:0; 
+	text-indent:0; 
+	list-style-type:none;
+	width: 25%;
+	background-color: black;
 }
 
-div.user {
-  float:left;
-  margin: 0 8px 10px 0;
+/* a- tag inside single tab */
+#flowtabs li a {
+	display:block;
+	height: 31px;   
+	padding:0px;
+	margin:0px;
+	
+	/* font decoration */
+	color:#efefef;
+	font-size:12px;
+	line-height:33px;
+	text-align:center;
+	text-decoration:none;
 }
 
-div.user img {
-  height: 64px;
-  width: 64px;
+#flowtabs li a:hover { background-color: #777; color: #eee; }
+
+
+/* panes */
+#flowpanes {
+	background: #e9ddaf;
+	width:580px;
+	height:250px;	
 }
 
-.tweeter {
-  font-weight: bold;
-  color: #003DE8;
-  display: block;
+
+/* single pane */
+#flowpanes div {
+	display:none;	
+	color:#000;	
+	margin:20px 40px;
 }
 
-.flash-msg {
-  background-color:#fff;
-  color:#000;
-  font-weight:bold;
-  font-family: "Times New Roman", Serif;
-  font-size: 16px;
-  margin:5px 10px;
-  padding:5px 10px;
+/* some decorations for elements inside single pane */
+#flowpanes div h2 {
+	font-weight:normal;
+	color:#ddd;
+	letter-spacing:1px;
+	margin:10px 0 0 0;
+	font-size:22px;	
 }
 
+#flowpanes a {
+	color:#cc9;		
+	font-size:14px;
+}
+
+#flowpanes p, #flowpanes samp {
+	color:#ccc;		
+}
+
+#flowpanes div.narrow {
+	padding-right:160px;		
+}
+
+/*
+  flow panes
+*/
+/* override the root element to enable scrolling */ 
+#flowpanes { 
+    position:relative; 
+    overflow:hidden; 
+    clear:both; 
+} 
+ 
+/* override single pane */ 
+#flowpanes div { 
+    float:left; 
+    display:block; 
+    width:580px; 
+    cursor:pointer; 
+    font-size:14px; 
+} 
+ 
+/* our additional wrapper element for the items */ 
+#flowpanes .items { 
+    width:20000em; 
+    position:absolute; 
+    clear:both; 
+    margin:0; 
+    padding:0; 
+} 
+ 
+#flowpanes .less, #flowpanes .less a { 
+    color:#000 !important; 
+    font-size:11px; 
+}
+
+.count {
+  font-family: "Georgia,serif";
+  font-size: 60px;
+  letter-spacing: 2px;
+  text-align: center;
+  color: #444;
+  padding: 10px 5px;
+}
+
+hr {
+  border: 1px solid #00ccff;
+}

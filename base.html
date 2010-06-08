@@ -15,38 +15,31 @@
     {% endblock %}
   </head>
   <body>
-  <div id="container">
-    <div id="header" class="row">
-      <h1 id="logo" class="col_8">
-        <a href="/" title="smstweet"> 
-          <!--
-          <img width="50px" height="34px" src="/images/smstweet.png" alt="SMSTweet">
-          -->
-          <img width="100px" height="100px" src="/images/logo.png" alt="SmsTweet - Sending Twitter Message over SMS"/>
-        </a>
-      </h1>
-      <div id="nav" class="col_8">
-        <ul>
-          <li><a href="/help" title="How to use SmsTweet and FAQ's">help</a></li>
-          <li><a href="/news" title="What's the latest with SmsTweet">news</a></li>
-          <li><a href="/stats" title="Some stats">stats</a></li>
-          <li><a href="/about" title="More about smstweet">about</a></li>
-        </ul>
-      </div>
-    </div>
-    <div id="banner" class="col_16">
-      <img src="/images/outstretched.jpg" alt="tweet if you've got range" />
-      <!--<img id="slogan" width="920px" height="39px" src="/images/slogan.jpg" alt="Start tweeting by simply sending an sms using your mobile phone." />-->
-    </div>
-    <div id="content" class="row">
-      {% block content %}
-      {% endblock %}
-    </div>
-    <div id="footer">
-      <p>
-      <a href="http://mayanks.blogspot.com/" title="Mayank's Blog">Blog</a> | <a href="http://twitter.com/mayanks" title="Follow me on Twitter">Twitter</a> | <a href="http://sms2ping.appspot.com" title="Check your server status over SMS">SMS2Ping</a> | <a href="http://mquote.heroku.com" title="Track BSE Quotes over sms SMS">mQuote</a> | Copyright 2010 Mayank Sharma
-      </p>
-    </div>
+    <div id="logo">
+      <div class="container">
+		  <header>
+		      <h1 class="col eight">
+		        <a href="/" title="Back to homepage">SMStweet</a>
+		      </h1>
+		    <nav class="col eight">
+		      <ul>
+		        <li><a {% if current %} {% ifequal current 'usage' %} class="current" {% endifequal %} {% endif %} href="/usage" title="How to use Smstweet">usage</a></li>
+		        <li><a {% if current %} {% ifequal current 'faq' %} class="current" {% endifequal %} {% endif %} href="/faq" title="FAQ's and simple guide on how to use SMStweet">faq</a></li>
+		        <li><a {% if current %} {% ifequal current 'news' %} class="current" {% endifequal %} {% endif %} href="/news" title="Latest updates from behind the scenes & press mentions">news</a></li>
+		        <li><a {% if current %} {% ifequal current 'about' %} class="current" {% endifequal %} {% endif %} href="/about" title="About SMStweet and it's creators">about</a></li>
+		      </ul>
+		    </nav>
+		    <br />
+		  </header>
+	  </div>
+	</div>
+
+    {% block content %}
+    {% endblock %}
+  <div class="container">
+    <footer><hr /><p>
+    <a href="http://mayanks.blogspot.com/" title="Mayank's Blog">Blog</a> | <a href="http://twitter.com/mayanks" title="Follow me on Twitter">Twitter</a> | <a href="http://sms2ping.appspot.com" title="Check your server status over SMS">SMS2Ping</a> | <a href="http://mquote.heroku.com" title="Track BSE Quotes over sms SMS">mQuote</a> | Copyright 2010 Mayank Sharma
+    </p></footer>
   </div>
     <script type="text/javascript">
       var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");

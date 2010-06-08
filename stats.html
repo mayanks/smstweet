@@ -2,7 +2,10 @@
 
 {% block content %}
 
-      <div class="col_6">
+  <div id="content-container">
+    <div class="container">
+      <section id="content">        
+        <section id="top_tweeters" class="col four">
         <h3>
           Top <em>sms</em>tweeters
         </h3>
@@ -15,8 +18,9 @@
           {% endfor %}
         </ol>
         </p>
-      </div>
-      <div class="col_8">
+        </section>
+
+        <section id="recent_tweets" class="col ten">
         <h3>
           Recent SMSTweets
         </h3>
@@ -38,8 +42,11 @@
         </p>
         <p>
         </p>
-      </div>
 
+        </section>
       <br />
 
+      </section>
+    </div>
+  </div>
 {% endblock %}

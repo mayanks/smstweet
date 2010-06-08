@@ -2,39 +2,42 @@
 
 {% block content %}
 
-      <div class="col_6">
-        <h3>
-          What is <em>sms</em>tweet?
-        </h3>
-        <p>
-          No longer depend on your web browser or a twitter client. No need to install any software on your phone or use Internet on your phone. No need to pay premium rates to your network provider.
-        </p>
-        <p>
-          Just send an sms at normal rates to tweet your thoughts.
-        </p>
-      </div>
-      <div class="col_6">
-        <h3>
-          Behind the scenes
-        </h3>
-        <p>
-        SMSTweets was an idea of <a href="http://mayanks.blogspot.com">Mayank</a> before Airtel came and announced its SMS based Twitter support. This application uses <a href="http://smsgupshup.com/">SMSGupShup's</a> platform to receive and respond to users SMSes and <a href="http://appengine.google.com">Google App-Engine</a> as the server to run.</p>
-        <p>
-        Design of this site was done by <a href="http://rohitarondekar.com/">Rohit Arondekar</a> who is motivated by simplicity in his designs. The spanking new logo was contributed by <a href="http://hrj.wikidot.com/" title="HRJ: Hello and welcome!">Harshad</a> &mdash; a software Architect, trekker, amateur astronomer, environmentalist and voracious reader.
-        </p>        
-      </div>
-      <div class="col_2">
-        <h3>
-          Statistics
-        </h3>
-        <p class="count">
-          {{counter}} 
-        </p>
-        <p>
-          <em>sms</em>tweets have been sent so far.
-        </p>
-      </div>
-      <br />
+  <div id="content-container">
+    <div class="container">
+      <section id="content">        
+        <section id="faqs" class="col five">
+          <h3>
+            What is <em>sms</em>tweet?
+          </h3>
+          <p>
+            No longer depend on your web browser or a twitter client. No need to install any software on your phone or use Internet on your phone. No need to pay premium rates to your network provider.
+          </p>
+          <p>
+            Just send an sms at normal rates to tweet your thoughts.
+          </p>
+        </section>
+        <section id="faqs" class="col six">
+          <h3>
+            Behind the scenes
+          </h3>
+          <p>
+            SMSTweets was an idea of <a href="http://mayanks.blogspot.com">Mayank</a> before Airtel came and announced its SMS based Twitter support. This application uses <a href="http://smsgupshup.com/">SMSGupShup's</a> platform to receive and respond to users SMSes and <a href="http://appengine.google.com">Google App-Engine</a> as the server to run.</p>
+          <p>
+            Design of this site was done by <a href="http://rohitarondekar.com/">Rohit Arondekar</a> who is motivated by simplicity in his designs. The spanking new logo was contributed by <a href="http://hrj.wikidot.com/" title="HRJ: Hello and welcome!">Harshad</a> &mdash; a software Architect, trekker, amateur astronomer, environmentalist and voracious reader.
+          </p>        
+        </section>
+        <section class="col five">
+          <p>
+<script src="http://widgets.twimg.com/j/2/widget.js"></script>
+<script>
+new TWTR.Widget({ version: 2, type: 'faves', rpp: 10, interval: 6000, title: 'What are people saying about', subject: 'SmsTweet', width: 250, height: 300, theme: { shell: { background: '#8bdbed', color: '#3b3b3b' }, tweets: { background: '#e3e3e3', color: '#444444', links: '#5575ab' } }, features: { scrollbar: true, loop: false, live: true, hashtags: true, timestamp: true, avatars: true, behavior: 'all' } }).render().setUser('smstweetin').start();
+</script>
+
+          </p>
+        </section>
+		  <br />
+      </section>
     </div>
+  </div>
 
 {% endblock %}

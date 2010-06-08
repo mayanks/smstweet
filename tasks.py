@@ -141,6 +141,12 @@ class FollowNewUser(webapp.RequestHandler):
       # Stop sending the follow status
       #status = "@%s has started using SMSTweet. Welcome %s to the group and tell about us to your friends" % (user, user)
       #info = sms_client.post('/statuses/update', 'POST', (200,401), status=status)  # TODO : this may fail, try three times 
+
+      sms_client.token = OAuthAccessToken.all().filter(
+                'specifier =', user).filter(
+                'service =', 'twitter').fetch(1)[0]
+      info = sms_client.post('/friendships/create', 'POST', (200,401,403), screen_name='smstweetin')  # TODO : this may fail, try three times 
+
     except (urlfetch.DownloadError, ValueError, Timeout), e:
       logging.warning("SmsTweetin:Friendship/create failed (%d) %s" % (count,e))
       if count > 10:

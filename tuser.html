@@ -2,36 +2,42 @@
 
 {% block content %}
 
-<div class="col_16"  style="margin-top:20px;width:850px">
-  {% if tuser %}
-  {% if tweets.0 %}
-      <div class="user">
-        <a href="http://twitter.com/{{tweets.0.screen_name}}" title="{{tweets.0.name}}"><img src="{{tweets.0.profile_image_url}}"></a>
-      </div>
-      <h3> {{ tuser.user }} </h3>
-  {% endif %}
-  <p>Number of SMSTweets : {{ tuser.tweetCount }}</p>
-  <div style="clear:both"></div>
-  <h3>
-    Recent Tweets
-  </h3>
-  <p>
-  <ul class="tweetsofuser">
-    {% for t in tweets %}
-      <li>
-      {{t.status}}<br />
-      <span class="updated">updated {{t.created_at|human_date}}</span>
-      </li>
-    {% endfor %}
+  <div id="content-container">
+    <div class="container">
+      <section id="content">        
+        {% if tuser %}
+          <section id="tweeter" class="col four">
+            {% if tweets.0 %}
+                <div class="user">
+                <a href="http://twitter.com/{{tweets.0.screen_name}}" title="{{tweets.0.name}}"><img src="{{tweets.0.profile_image_url}}"></a>
+                </div>
+                <h3> {{ tuser.user }} </h3>
+            {% endif %}
+            <p>Number of SMSTweets : {{ tuser.tweetCount }}</p>
+          </section>
+          <section id="recent_tweets" class="col ten">
+          <h3> Recent Tweets </h3>
+          <p>
+            <ul class="tweetsofuser">
+            {% for t in tweets %}
+              <li>
+                {{t.status}}<br />
+                <span class="updated">updated {{t.created_at|human_date}}</span>
+              </li>
+            {% endfor %}
  
-  </ul>
-  {% else %}
-  <h3>
-    No user by that name exists
-  </h3>
-  {% endif %}
-  <br />
-</div>
-  <div style="clear:both"></div>
+            </ul>
+          </section>
+        {% else %}
+          <section id="tweeter" class="col four">
+            <h3>
+                No user by that name exists
+            </h3>
+          </section>
+        {% endif %}
+        <br />
+      </section>
+    </div>
+  </div>
 {% endblock %} 
 

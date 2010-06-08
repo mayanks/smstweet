@@ -19,91 +19,87 @@
 {% endblock %}
 
 {% block content %}
+	  <div id="banner-container">
+	    <div class="container">
+	      <section id="banner">
+	        <div class="col two"> &nbsp;
+            </div>
+	        <div class="col six">
+	          <img src="/images/smstweet.png" height="260px" alt="how smstweet works" />
+	        </div>
+	        <h3 class="col six">
+	          <div><em>Send a simple sms using your mobile phone to post tweets to your <a href="http://www.twitter.com" title="Twitter">Twitter</a> profile and recieve your mentions, updates and direct messages.</em><br /></div>
+	          <p><center><a href="/oauth/twitter/login"><img width="151px" height="24px" src="images/twitter_button.png" alt="sign in with Twitter" /></a></center></p>
+	        </h3>
+	        <div class="col two"> &nbsp;
+            </div>
+	        <br />
+	      </section>
+	    </div>
+    </div>
+
+    <div id="content-container">
+      <div class="container">
 
       {% if flash.msg %}
         <div class="flash-msg">{{flash.msg}}</div>
       {% endif %}
-      <!-- <div class="flash-msg">Not an Emmy but <em>sms</em>tweet is participating in the <a href="http://shortyawards.com/category/apps">ShortyAwards</a>. If you use and like this service, please <a href="http://shortyawards.com/smstweetin">vote for it here</a>.</div> -->
-      <div class="col_4">
-        <h3>
-          What is <em>sms</em>tweet?
-        </h3>
-        <p>
-          A simple service that allows you to <a href="http://www.twitter.com" title="Twitter">tweet</a> using sms in India.
-        </p>
-        <p>
-          No longer depend on your web browser or a twitter client. No need to install any software on your phone or use Internet on your phone. No need to pay premium rates to your network provider.
-        </p>
-        <p>
-          Just send an sms at <a href="/help#cost" title="So how much do I end up paying?">normal rates</a> to tweet your thoughts.
-        </p>
-      </div>
-      <div class="col_4">
-        <h3>
-          Register
-        </h3>
-        {% if user_name %}
-           {{message}}
-        {% else %}
-        <p>
-        Send an sms <strong>'REGISTER &lt;twitter username&gt; &lt;twitter password&gt;'</strong> to any of the following nos:
-        </p>
-        <ul>
-          <li>
-            <strong>09220092200</strong> (Mumbai)
-          </li>
-          <li>
-            <strong>09243000111</strong> (Bangalore)
-          </li>
-        </ul>
-        <p>
-          Or <strong>register online</strong> &mdash; start by simply clicking the button below.
-        </p>
-        <a href="/oauth/twitter/login"><img width="151px" height="24px" src="images/twitter_button.png" alt="sign in with Twitter" /></a>
-        {% endif %}
-      </div>
-      <div class="col_4">
-        <h3>
-          Already registered?
-        </h3>
+	      <section id="content">	      
+		      <section id="about" class="col six">
+		        <h3>
+                What is <em>sms</em>tweet?
+		        </h3>
+		        <p>
+	            A simple service that allows you to <a title="Twitter" href="http://www.twitter.com">tweet</a> using sms in India.
+	          </p>
+	          <p>
+	            No longer depend on your web browser or a twitter client. No need to install any software on your phone or use Internet on your phone. No need to pay premium rates to your network provider.
+	          </p>
+	          <p>
+	            Just send an sms at <a title="So how much do I end up paying?" href="/help#cost">normal rates</a> to tweet your thoughts.
+	          </p>
+		      </section>
+		      <section id="press" class="col six">
+		         <h3>
+                 Register
+		        </h3>
+                {% if user_name %}
+                    {{message}}
+                {% else %}
+                    <p>
+                    Send an sms <strong>'REGISTER &lt;twitter username&gt; &lt;twitter password&gt;'</strong> to any of the following nos:
+                    </p>
+                    <ul>
+                    <li>
+                    <strong>09220092200</strong> (Mumbai)
+                    </li>
+                    <li>
+                    <strong>09243000111</strong> (Bangalore)
+                    </li>
+                    </ul>
+                    <p>
+                      Or <strong>register online</strong> &mdash; start by simply clicking the button below.
+                    </p>
+                    <a href="/oauth/twitter/login"><img width="151px" height="24px" src="images/twitter_button.png" alt="sign in with Twitter" /></a>
+               {% endif %}
 
-        <p>
-        Start tweeting by sending a message, <strong>'TWT &lt;your message&gt;'</strong> to any of the following nos: 
-        </p>
-        <ul>
-          <li>
-            <strong>09220092200</strong> (Mumbai)
-          </li>
-          <li>
-            <strong>09243000111</strong> (Bangalore)
-          </li>
-        </ul>        
-        <p>
-          STD charges will apply for <em>sms</em>tweet'ers who don't live in the above cities. <a href="/help#localnos" title="Find out why not having a local nos is not a problem.">Find out</a> why that may not be such a bad thing.
-        </p>
-        </div>
-      <div class="col_2">
-        <h3>
-          Statistics
-        </h3>
-        <p class="count">
-        {{counter}}
-        </p>
-        <p>
-          <em>sms</em>tweets have been sent so far.
-        </p>
-        <h3>
-          Recent SMStweeters
-        </h3>
-        <p>
-        <ul>
-        {% for t in recentTweeters %}
-        <li>
-          <a href="http://twitter.com/{{t}}" title="@{{t}}'s Twitter profile">@{{t}}</a>
-        <li>
-        {% endfor %}
-        </ul>
-        </p>
-      </div>
-      <br />
+		      </section>
+		      <section id="latest" class="col four">
+		        <h3>
+		          Latest Smstweets
+		        </h3>
+                <p class="count">
+                    <a href="/stats">{{counter}}</a>
+                </p>
+                <p>
+                  <em>sms</em>tweets have been sent so far.
+                </p>
+ 
+                <iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.smstweet.in&amp;layout=standard&amp;show_faces=true&amp;width=450&amp;action=like&amp;font=verdana&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height:px"></iframe>
+		      </section>
+		      <br />
+		    </section>	      
+		  </div>
+		</div>
+
 {% endblock %}

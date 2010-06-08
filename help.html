@@ -1,83 +1,77 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <div id="content-container">
+      <div class="container">
+	      <section id="content">	      
+	        <section id="lead">
+	          <h3>
+	            TWEETING THE WAY IT WAS MEANT TO BE
+	          </h3>
+	          <h3 class="lead">
+	            Twitter is meant to be used via mobile phones through SMS. Unfortunately in India, only one provider &mdash; <a href="http://www.airtel.in" title="Airtel homepage">Airtel</a> &mdash; provides this service. If you use any other network you will need Internet enabled on your phone to tweet. We aim to help you tweet using any provider, without Internet enabled, through a simple sms.
+	          </h3>
+	        </section>
+		      <section id="about" class="col ten" style="overflow: hidden;">
+            <h3>
+		          SMSTWEET COMMANDS
+		        </h3>
+            <p>
+              Once you have registered with Smstweet you can start using the following commands to interact with <a href="http://www.twitter.com" title="Twitter">Twitter</a>.
+            </p>
+<br />
+            <img src="images/tweet.jpg" width="100px" height="90px" style="float:left; padding-right: 10px;"/>
+            <h4>TWT message</h4>
+            <p>
+              Use this command to post a tweet to your profile. The message must be 140 chars or less. You will get the most recent mention of yours in reply on successful posting.
+            </p>
 
-      <div class="col_8">
-        <h3>
-          Frequently Asked Questions
-        </h3>
-        <h4 id="cost">
-          So how much do I end up paying?
-        </h4>
-        <p>
-          You pay nothing to us for the service. However the nos used by <em>sms</em>tweet belongs to Mumbai & Bangalore. If your phone nos belongs to these cities it costs the same as a local sms. However if you live outside of these cities &mdash; it costs the same as a national sms. Different providers have various schemes and packs which could make sending an sms cheaper or even free. For example Reliance charges 1p/sms.
-        </p>
-        <h4 id="time-lag">
-          How long does it take to post the tweet?
-        </h4>
-        <p>
-          The time it takes to post your tweet depends on two factors. Mainly the time it takes for your sms to arrive at our nos and then how fast our application can post your tweet. The second factor is an important one because Twitter does have it's fail whale moments.
-        </p>
-        <h4 id="keywords">
-          Why do I have to type 'twt' before my tweet?
-        </h4>
-        <p>
-          We know it can be quite irritating to type 'twt' every time you want to tweet. However at present it is required to enable SMSgupshup to identify <em>sms</em>tweet as the recipient application. Otherwise your tweet could get lost. There is another benefit &mdash; you will never tweet a message that was meant for somebody &mdash; because without the keyword 'twt' it's not a tweet.
-        </p>
-        <h4 id="localnos">
-          I live in state X why don't you have a local number here?
-        </h4>
-        <p>
-          In due time we may have a local number for every city. However for the time being only two numbers are available. Moreover various providers have schemes and sms packs which could make sending an sms cheaper or even free. For example Reliance charges 1p/sms. The price war between providers could negate the need for local numbers in every state. So keep your fingers crossed.
-        </p>
-        <h4 id="profit">
-          How much are your earning on every tweet I send?
-        </h4>
-        <p>
-          Nothing. Zero. Nil. Simply put this service is offered completely free of cost. There are no advertisements and as of now no plans to have any. We don't have any big funding or tie ups with network providers. The only cost you have to incur is the charge of a local/nation sms. The only profit we get is the happiness of having people actually use our application.
-        </p>
-        <h4 id="dms">
-          Why can't I send or recieve Direct Messages?
-        </h4>
-        <p>
-          This feature has been requested quite often. This service started as an experiment but as more users start using <em>sms</em>tweet, more features will be added. Direct Messages is one of such features that is in the pipeline.
-        </p>
-      </div>
-      <div class="col_6">
-        <h3>
-          Guide to <em>sms</em>tweet
-        </h3>
-        <p>
-          <em>sms</em>tweet is a simple service that allows you to post tweets via sms in India. Currently <a href="http://www.twitter.com" title="Twitter">Twitter</a> provides this service via only one provider &mdash; <a href="http://www.airtel.in" title="Airtel">Airtel</a>. There are no such limitations on <em>sms</em>tweet.
-        </p>
-        <h4>
-          Registration
-        </h4>
-        <p>
-          You will need to register at <em>sms</em>tweet before you can start tweeting. There are two ways in which you can register &mdash; OAuth or via sms. If you want to use OAuth then you will need to click on the 'Sign in with twitter' button on the front page of <em>sms</em>tweet. On doing so you will be redirected to login into your twitter account. After logging in you will be asked to 'Allow' access to <em>sms</em>tweet. Next you will be redirected back here so that you can enter the mobile nos with which you wish to tweet.
-        </p>
-        <p>
-          If you don't intend on clicking so much then you can register by simply sending a single sms. Just send an sms <strong>'REGISTER &lt;twitter username&gt; &lt;twitter password&gt;'</strong> to <strong>09220092200</strong> (Mumbai) or <strong>09243000111</strong> (Bangalore). Once you get the confirmation that your registration was successful you can start tweeting.
-        </p>
-        <h4>
-          Tweeting
-        </h4>
-        <p>
-          Tweeting is as simple as sending an sms. Just send <strong>'TWT &lt;your message&gt;'</strong> to <strong>09220092200</strong>(Mumbai) or <strong>09243000111</strong>(Bangalore). If everything went well then you will recieve the latest mention of yours.
-        </p>
+<br />
+            
+            <img src="images/tweet.jpg" width="100px" height="90px" style="float:left; padding-right: 10px;"/>
+            <h4>TWUP [N] [username]</h4>
+            <p>
+              Returns most recent tweet from your home timeline. If N, a number from 1 to 100, is specified then the N<sup>th</sup> tweet will be returned. If username, any user that you follow, is specified then recent tweet from this user will be returned.
+            </p>
 
-        <h4>
-          Reading Updates
-        </h4>
-        <p>
-        You can receive status from your public timeline by just sms'ing <b>TWUP</b>. You can also specify the number of status to receive or the status sent by one of your friend.
-        <ol>
-          <li><b>TWUP :</b> Returns latest tweet from your timeline. eg. SMS "TWUP" to 9243000111
-        <li><b>TWUP &lt;n&gt; :</b> Returns n'th tweet from your timeline. eg. SMS "TWUP 23" will return 23'rd tweet from your timeline. Note that 23'rd tweet is relative to time you sent the message. If an hour later you receive some more tweets, your 23'rd tweet will be different.
-        <li><b>TWUP &lt;user_name&gt; :</b> Returns the latest tweet in your timeline from user_name. user_name can either be a full twitter handle of the friend whose tweet you want or a part of it. For example SMS "TWUP smstweetin" to get latest tweet from smstweet. You can save on typing the entire name by typing just a part of the name. For example SMS "TWUP sms" will fetch first tweet from your timeline whose twitter handle matches "sms". 
-        </ol>
-      </div>
+<br />
 
-      <br />
+            <img src="images/tweet.jpg" width="100px" height="90px" style="float:left; padding-right: 10px;"/>
+            <h4>TWME [N]</h4>
+            <p>
+              Returns most recent mention of yours. If N, a number from 1 to 100, is specified then the N<sup>th</sup> tweet with your mention will be returned.
+            </p>
+
+<br />
+
+            <img src="images/tweet.jpg" width="100px" height="90px" style="float:left; padding-right: 10px;"/>
+            <h4>TWDM [N]</h4>
+            <p>
+              Returns most recent direct message (DM) that you have recieved. If N, a number from 1 to 100, is specified then the N<sup>th</sup> direct message (DM) is returned.
+            </p>
+            
+		      </section>
+		      <section id="press" class="col six">
+		         <h3>
+		          SERVICE NUMBERS
+		        </h3>
+            <p>
+              You can use any one of the following numbers to send your smstweets.
+            </p>
+            <ul>
+              <li><strong>09220092200</strong> (Mumbai)</li>
+              <li><strong>09243000111</strong> (Bangalore)</li>
+            </ul>
+            <p class="note">
+              *If you live in one of the above cities then use the local number.
+            </p>
+            <p class="note">
+              *If you don't live in any of the above cities then you will be sending a national SMS. Consult your service provider for the respective charges.
+            </p>
+          </section>
+		      <br />
+		    </section>	      
+		  </div>
+		</div>
 
 {% endblock %}

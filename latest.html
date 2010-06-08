@@ -1,104 +1,105 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div id="content-container">
+      <div class="container">
+	      <section id="content">	      
+		      <section id="faqs" class="col ten">
+		        <h3>
+		          UPDATES FROM BEHIND THE SCENES
+		        </h3>
+		        <h4>
+		          <a href="http://mayanks.blogspot.com/2010/03/xauth-for-smstweets.html">SmsTweets gets xAuth</a>
+		          <span class="date">Mar 06 2010</span>
+		        </h4>
+		        <p>
+		        xAuth is a modification to OAuth protocol to allow browser less access to OAuth tokens. OAuth redirects users to twitter to let users allow an application get access to a users. This way the application need not store the password of their users. But on the other hand it creates a problem when user register through their mobile phone. In that case there is no browser and hence no redirection to twitter page to grant access. But just a couple of days ago, <a href="http://apiwiki.twitter.com/Twitter-REST-API-Method:-oauth-access_token-for-xAuth">Twitter released a restricted access to xAuth</a> which allows access to the tokens using username and password. We got SMSTweet registered for xAuth and now all users irrespective of how they registered, are on OAuth.
+		        </p>
+		        <h4>
+		          Crossing the 10k tweets marks
+		          <span class="date">Jan 21 2010</span>
+		        </h4>
+		        <p>
+		          First things first, <em>sms</em>tweet is participating in the <a href="http://shortyawards.com/category/apps">ShortyAwards</a>. If you use and like this service, please <a href="http://shortyawards.com/smstweetin">vote for it here</a>. It will help a lot to make this service more visible to all the folks who feel the need to tweet. It's amazing how so many people are using <em>sms</em>tweet lately. It has recorded 1.2k+ tweets within 48 hours recently and it looks like the stats will only increase. The first 100 tweets took quite a while but it recently crossed 10k tweets. It's really nice that people are using this service. Keep tweeting folks!
+		        </p>
 
-      <div class="col_8">
-        <h3>
-          Updates from behind the scenes
-        </h3>
-        <h4>
-          <a href="http://mayanks.blogspot.com/2010/03/xauth-for-smstweets.html">SmsTweets gets xAuth</a>
-          <span class="date">Mar 06 2010</span>
-        </h4>
-        <p>
-        xAuth is a modification to OAuth protocol to allow browser less access to OAuth tokens. OAuth redirects users to twitter to let users allow an application get access to a users. This way the application need not store the password of their users. But on the other hand it creates a problem when user register through their mobile phone. In that case there is no browser and hence no redirection to twitter page to grant access. But just a couple of days ago, <a href="http://apiwiki.twitter.com/Twitter-REST-API-Method:-oauth-access_token-for-xAuth">Twitter released a restricted access to xAuth</a> which allows access to the tokens using username and password. We got SMSTweet registered for xAuth and now all users irrespective of how they registered, are on OAuth.
-        </p>
-        <h4>
-          Crossing the 10k tweets marks
-          <span class="date">Jan 21 2010</span>
-        </h4>
-        <p>
-          First things first, <em>sms</em>tweet is participating in the <a href="http://shortyawards.com/category/apps">ShortyAwards</a>. If you use and like this service, please <a href="http://shortyawards.com/smstweetin">vote for it here</a>. It will help a lot to make this service more visible to all the folks who feel the need to tweet. It's amazing how so many people are using <em>sms</em>tweet lately. It has recorded 1.2k+ tweets within 48 hours recently and it looks like the stats will only increase. The first 100 tweets took quite a while but it recently crossed 10k tweets. It's really nice that people are using this service. Keep tweeting folks!
-        </p>
+		        <h4>
+		          A completed help page and a few more tweaks.
+		          <span class="date">Dec 25 2009</span>
+		        </h4>
+		        <p>
+		          We now have a <a title="Help with smstweet" href="/help">help page</a> that is complete with a guide and FAQ's. Also a few tweaks were made to the web site text &mdash; hopefully making it easier to understand what the service is and how to use it. If something isn't working the way it should feel free to tweet <a title="smstweetin on Twitter" href="http://www.twitter.com/smstweetin">@smstweetin</a>, <a title="Mayank on Twitter" href="http://www.twitter.com/mayanks">@mayanks</a> or <a title="Rohit on Twitter" href="http://www.twitter.com/rohitarondekar">@rohitarondekar</a>.
+		        </p>
+		      </section>
+		      <section id="press" class="col six">
+		         <h3>
+		          PRESS MENTIONS
+		        </h3>
+		        <p>
+		          “Social networking and micro-blogging site Twitter.com has been gaining popularity in India with news channels and entertainment channels alike using the service to get impromptu opinions on all topics under the sun.”
+		          <br>
+		          <a title="Tweeting via SMS is in, the way it should be - dnaindia.com" href="http://www.dnaindia.com/scitech/report_tweeting-via-sms-is-in-the-way-it-should-be_1324562">DNA News Website &amp; Print(Bangalore Edition)</a>
+		        </p>
 
-        <h4>
-          A completed help page and a few more tweaks.
-          <span class="date">Dec 25 2009</span>
-        </h4>
-        <p>
-          We now have a <a href="/help" title="Help with smstweet">help page</a> that is complete with a guide and FAQ's. Also a few tweaks were made to the web site text &mdash; hopefully making it easier to understand what the service is and how to use it. If something isn't working the way it should feel free to tweet <a href="http://www.twitter.com/smstweetin" title="smstweetin on Twitter">@smstweetin</a>, <a href="http://www.twitter.com/mayanks" title="Mayank on Twitter">@mayanks</a> or <a href="http://www.twitter.com/rohitarondekar" title="Rohit on Twitter">@rohitarondekar</a>.
-        </p>
-      </div>
-      <div class="col_6">
-        <h3>
-          Press mentions for <em>sms</em>tweet
-        </h3>
-        <p>
-          “Social networking and micro-blogging site Twitter.com has been gaining popularity in India with news channels and entertainment channels alike using the service to get impromptu opinions on all topics under the sun.”
-          <br />
-          <a href="http://www.dnaindia.com/scitech/report_tweeting-via-sms-is-in-the-way-it-should-be_1324562" title="Tweeting via SMS is in, the way it should be - dnaindia.com">DNA News Website & Print(Bangalore Edition)</a>
-        </p>
+		        <p>
+		        <i>“Tweeting is fun when you share your experiences right away. Once I tweeted from middle of a river! SMSTweet just enables you to do it! No need of a GPRS connection, no need of a fancy device, all you need is a mobile phone”</i>
+		          <br>
+		          <a title="SMStweet lets you Tweet via local SMS" href="http://www.techbangalore.com/smstweet-lets-you-tweet-via-local-sms/">TechBangalore</a>
+		        </p>
 
-        <p>
-        <i>“Tweeting is fun when you share your experiences right away. Once I tweeted from middle of a river! SMSTweet just enables you to do it! No need of a GPRS connection, no need of a fancy device, all you need is a mobile phone”</i>
-          <br />
-          <a href="http://www.techbangalore.com/smstweet-lets-you-tweet-via-local-sms/" title="SMStweet lets you Tweet via local SMS">SMStweet lets you Tweet via local SMS</a>
-        </p>
+		        <p>
+		          “Tweet even with a simplest black&amp;white mobile without worrying to have a data activated phone.”
+		          <br>
+		          <a title="Mobile Gyaan" href="http://www.mobilegyaan.com/smstweets-helps-you-tweet-by-sending-an-sms">
+		Mobile Gyaan</a>
+		        </p>
 
-        <p>
-          “Tweet even with a simplest black&amp;white mobile without worrying to have a data activated phone.”
-          <br />
-          <a href="http://www.mobilegyaan.com/smstweets-helps-you-tweet-by-sending-an-sms" title="
-Mobile Gyaan">
-Mobile Gyaan</a>
-        </p>
+		        <p>
+		          “Yesterday I came across a wonderful and innovative service called SMStweet.in which is an extremely easy-to-use and effective service to send tweets using mobile phone SMS.”
+		          <br>
+		          <a title="Sites To Use" href="http://www.sitestouse.com/smstweet-in-tweet-from-any-mobile-phone-via-sms/">
+		Sites To Use</a>
+		        </p>
 
-        <p>
-          “Yesterday I came across a wonderful and innovative service called SMStweet.in which is an extremely easy-to-use and effective service to send tweets using mobile phone SMS.”
-          <br />
-          <a href="http://www.sitestouse.com/smstweet-in-tweet-from-any-mobile-phone-via-sms/" title="
-Sites To Use">
-Sites To Use</a>
-        </p>
+		        <p>
+		          “You don’t really need an internet enabled cell phone &ndash; an old model phone or phones that fits your budget can use smstweet to make tweets instantly which works to your advantage!”
+		          <br>
+		          <a title="Smstweet &ndash; Tweeting Service For Non Internet Mobile Phones in Bangalore" href="http://bangaloreloka.com/2009/bangalore-startups/smstweet-tweeting-service-for-non-internet-mobile-phones-in-bangalore.html">
+		Bangalore Loka</a>
+		        </p>
 
-        <p>
-          “You don’t really need an internet enabled cell phone – an old model phone or phones that fits your budget can use smstweet to make tweets instantly which works to your advantage!”
-          <br />
-          <a href="http://bangaloreloka.com/2009/bangalore-startups/smstweet-tweeting-service-for-non-internet-mobile-phones-in-bangalore.html" title="
-Smstweet – Tweeting Service For Non Internet Mobile Phones in Bangalore">
-Bangalore Loka</a>
-        </p>
+		        <p>
+		          “Last day I stumbled over a fresh and amazing service called SMSTweet. What’s amazing is the simplicity of the concept and that its not backed by any Mobile service provider.”
+		          <br>
+		          <a title="Update Twitter via SMS at No Extra Cost | Website Reviews" href="http://www.millionclues.com/reviews/website-reviews/twitter-on-sms">Million Clues</a>
+		        </p>        
 
-        <p>
-          “Last day I stumbled over a fresh and amazing service called SMSTweet. What’s amazing is the simplicity of the concept and that its not backed by any Mobile service provider.”
-          <br />
-          <a href="http://www.millionclues.com/reviews/website-reviews/twitter-on-sms" title="Update Twitter via SMS at No Extra Cost | Website Reviews">Million Clues</a>
-        </p>        
+		        <p>
+		          “The most convenient way to control the PC/System, while you are not at home is controlling it by SMS. Not only Home it can be Office also, in a way you can say controlling the computer wirelessly or remotely. This feature can be widely implemented in the ”
+		          <br>
+		          <a title="Control your computer through SMS - Free of Cost" href="http://www.tech-tweak.net/2009/12/control-your-computer-through-sms-free.html">Tech Tweak</a>
+		        </p>
 
-        <p>
-          “The most convenient way to control the PC/System, while you are not at home is controlling it by SMS. Not only Home it can be Office also, in a way you can say controlling the computer wirelessly or remotely. This feature can be widely implemented in the ”
-          <br />
-          <a href="http://www.tech-tweak.net/2009/12/control-your-computer-through-sms-free.html" title="Control your computer through SMS - Free of Cost">Tech Tweak</a>
-        </p>
+		        <p>
+		          “A month back, Twitter and AirTel joined hands to offer Twitter via SMS, and the service was available exclusively to Bharti AirTel customers. Moreover, customers were charged premium rates for every SMS.”
+		          <br>
+		          <a title="Update your Twitter via SMS at No Extra Cost" href="http://www.josephcs.com/blog/update-twitter-via-sms-free/">Josephcscs</a>
+		        </p>
 
-        <p>
-          “A month back, Twitter and AirTel joined hands to offer Twitter via SMS, and the service was available exclusively to Bharti AirTel customers. Moreover, customers were charged premium rates for every SMS.”
-          <br />
-          <a href="http://www.josephcs.com/blog/update-twitter-via-sms-free/" title="Update your Twitter via SMS at No Extra Cost">Josephcscs</a>
-        </p>
+		        <p>
+		          “SMStweet as the name says, lets you tweet through SMS. Why is this a big deal when there’s already a service offered by an Indian service provider? Well, for once this isn’t tied to a particular network."
+		          <br>
+		          <a title="SMStweet &ndash; Indian twitter users can now use twitter via regular SMS!" href="http://www.twi5.com/smstweet-indian-twitter-users-can-now-use-twitter-via-regular-sms/7751/">Twi5</a>
+		        </p>
 
-        <p>
-          “SMStweet as the name says, lets you tweet through SMS. Why is this a big deal when there’s already a service offered by an Indian service provider? Well, for once this isn’t tied to a particular network."
-          <br />
-          <a href="http://www.twi5.com/smstweet-indian-twitter-users-can-now-use-twitter-via-regular-sms/7751/" title="SMStweet – Indian twitter users can now use twitter via regular SMS!">Twi5</a>
-        </p>
-
-        <p>
-          “Mayank Sharma has launched a service SMSTWEET which will enable its users to tweet via SMS. Those using Reliance Mobile's SMS scheme will surely gonna enjoy this.”
-          <br />
-          <a href="http://mobigyaan.com/now-tweet-twittercom-via-sms-without-paying-premium-rates" title="Now tweet (twitter.com) via SMS without paying Premium Rates">Mobi Gyaan</a>
-        </p>
-      </div>
-      <br />
-
+		        <p>
+		          “Mayank Sharma has launched a service SMSTWEET which will enable its users to tweet via SMS. Those using Reliance Mobile's SMS scheme will surely gonna enjoy this.”
+		          <br>
+		          <a title="Now tweet (twitter.com) via SMS without paying Premium Rates" href="http://mobigyaan.com/now-tweet-twittercom-via-sms-without-paying-premium-rates">Mobi Gyaan</a>
+		        </p>		        
+          </section>
+		      <br />
+		    </section>	      
+		  </div>
+		</div>
 {% endblock %}

@@ -163,18 +163,26 @@ class AboutPage(webapp.RequestHandler):
 
     values = {
       'counter' : intWithCommas(stats.counter),
-      'recentTweeters' : stats.recentTweeters
+      'recentTweeters' : stats.recentTweeters,
+      'current' : 'about'
       }
  
     self.response.out.write(template.render('about.html', values))
 
 class HelpPage(webapp.RequestHandler):
   def get(self):
-    self.response.out.write(template.render('help.html', None))
+    values = { 'current' : 'usage'}
+    self.response.out.write(template.render('help.html', values))
+
+class FaqPage(webapp.RequestHandler):
+  def get(self):
+    values = { 'current' : 'faq'}
+    self.response.out.write(template.render('faq.html', values))
 
 class LatestPage(webapp.RequestHandler):
   def get(self):
-    self.response.out.write(template.render('latest.html', None))
+    values = { 'current' : 'news'}
+    self.response.out.write(template.render('latest.html', values))
 
 class Statistics(webapp.RequestHandler):
   def get(self):
@@ -241,6 +249,8 @@ application = webapp.WSGIApplication([
   ('/', MainPage),
   ('/about', AboutPage),
   ('/help', HelpPage),
+  ('/usage', HelpPage),
+  ('/faq', FaqPage),
   ('/news', LatestPage),
   ('/stats', Statistics),
   ('/test', Test),
